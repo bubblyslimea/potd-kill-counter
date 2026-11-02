@@ -20,6 +20,10 @@ already using the Pages `/notation/repo.json` address? that row works too, you o
 this is an early alpha, live PotD checks are still pending
 please try a low-floor run before taking it into an important climb
 
+![the shared repository page with Notation and the counter](assets/shared-repository.jpg)
+
+[one address for my little tools](https://give-riri-a-cookie.pages.dev/plugins/)
+
 [what changed](CHANGELOG.md) · [floor ranges](FLOOR_RANGES.md) · [technical details](TECHNICAL_DETAILS.md) · [MIT license](LICENSE)
 
 by Riri Fujiwara
