@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+artifacts/
+plugin/
+.tool-cache/
+*.user
+*.pdb
+__pycache__/
