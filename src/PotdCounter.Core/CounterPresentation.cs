@@ -1,14 +1,17 @@
 namespace PotdCounter.Core;
 
-public enum CounterTone { Neutral, Ready, Attention }
+public enum CounterTone { Neutral, Ready, Attention, Active, Future }
+
+public readonly record struct FlightBadge(string Status, string Detail, CounterTone Tone, bool TwoLines);
 
 // Select readable, truthful display content independently of the native drawing code.
 public readonly record struct CounterPresentation(
     string Main, string Caption, string? Observed, string? Range, string Note,
-    CounterTone Tone, bool IsEstimate, bool ShowFlight)
+    CounterTone Tone, bool IsEstimate, bool ShowFlight, FlightBadge Flight,
+    string? NextFlightNotice, CounterTone NextFlightTone, string? DestinationNotice)
 {
     public static CounterPresentation Create(int floor, int kills, KnownState here,
-        bool passageOpen, bool countComplete, bool counterAvailable = true)
+        bool passageOpen, bool countComplete, bool counterAvailable = true, KnownState next = KnownState.Unknown)
     {
         var estimate = PassageEstimator.Estimate(floor, kills, here, passageOpen, countComplete);
         var normalFloor = FloorRules.Kind(floor) == FloorKind.Normal;
@@ -20,43 +23,69 @@ public readonly record struct CounterPresentation(
             _ => $"floor total: {target} normal / {target.WithFlight()} with Flight",
         };
         var showFlight = floor is >= 1 and < 200;
+        var badge = floor == 1 && here == KnownState.Off
+            ? new FlightBadge("FIRST FLOOR:", "Flight Unavailable", CounterTone.Neutral, true)
+            : new FlightBadge(here switch
+                {
+                    KnownState.On => "ACTIVE",
+                    KnownState.Off => "INACTIVE",
+                    _ => "UNKNOWN",
+                }, "Flight", here switch
+                {
+                    KnownState.On => CounterTone.Active,
+                    KnownState.Unknown => CounterTone.Attention,
+                    _ => CounterTone.Neutral,
+                }, false);
+        // Completion cannot benefit from another Flight; retain the raw queue in settings.
+        var nextNotice = floor is >= 1 and < 199 ? next switch
+        {
+            KnownState.On => "NEXT FLOOR: Flight activated",
+            KnownState.Unknown => "NEXT FLOOR: Flight unknown",
+            _ => null,
+        } : null;
+        var nextTone = next == KnownState.On ? CounterTone.Future : CounterTone.Attention;
+        var destination = showFlight && FloorRules.Kind(floor + 1) == FloorKind.Boss
+            ? "BOSS NEXT FLOOR" : floor == 199 ? "FINAL FLOOR NEXT" : null;
+
+        CounterPresentation Present(string main, string caption, string note, CounterTone tone, bool isEstimate = false,
+            bool includeObserved = true) => new(main, caption, includeObserved ? observed : null, range, note,
+                tone, isEstimate, showFlight, badge, nextNotice, nextTone, destination);
 
         if (!counterAvailable && normalFloor && estimate.Kind != EstimateKind.Open)
-            return new("tracking paused", "kill count unavailable", null, range,
+            return Present("?", "tracking unavailable",
                 "the passage status can still be read, remaining estimates are paused",
-                CounterTone.Attention, false, showFlight);
+                CounterTone.Attention, includeObserved: false);
 
         var (main, caption, note, tone) = estimate.Kind switch
         {
-            EstimateKind.Normal => ($"~{estimate.Remaining}", "estimated kills left",
+            EstimateKind.Normal => ($"~{estimate.Remaining}", "kills left",
                 "each floor rolls its own target, clearing every enemy can open the passage early",
                 CounterTone.Neutral),
-            EstimateKind.Open => ("passage open", "ready for the next floor",
+            EstimateKind.Open => ("OPEN", "passage",
                 "the game has confirmed the passage is open", CounterTone.Ready),
-            EstimateKind.Partial => ("kills left unknown", "partial count",
+            EstimateKind.Partial => ("?", "partial count",
                 "earlier or distant party kills may be missing, the observed count is not a full floor total",
                 CounterTone.Attention),
-            EstimateKind.UnknownFlight => ("kills left unknown", "Flight not confirmed",
+            EstimateKind.UnknownFlight => ("?", "Flight not confirmed",
                 "Flight on this floor is unknown until there is enough observed floor history",
                 CounterTone.Attention),
-            EstimateKind.RangeExceeded => ("check the passage", "past the estimated range",
+            EstimateKind.RangeExceeded => ("CHECK", "past the estimated range",
                 "the count has reached the published range, only the game can confirm an open passage",
                 CounterTone.Attention),
-            EstimateKind.Boss => ("boss floor", "no normal kill target",
+            EstimateKind.Boss => ("BOSS", "no monster quota",
                 "the normal monster ranges do not apply on boss floors", CounterTone.Neutral),
-            EstimateKind.Complete => ("you made it !!", "the climb is complete",
+            EstimateKind.Complete => ("CLEAR", "you made it !!",
                 "floor 200 is the completion floor", CounterTone.Ready),
-            _ => ("waiting for PotD", "appears when your run starts",
+            _ => ("WAIT", "waiting for PotD",
                 "the live counter follows Palace of the Dead", CounterTone.Neutral),
         };
-        return new(main, caption, observed, range, note, tone,
-            estimate.Kind == EstimateKind.Normal, showFlight);
+        return Present(main, caption, note, tone, estimate.Kind == EstimateKind.Normal);
     }
 
     public static string FlightLabel(KnownState value, bool nextFloor = false) => value switch
     {
         KnownState.On => nextFloor ? "queued" : "active",
-        KnownState.Off => nextFloor ? "not queued" : "off",
+        KnownState.Off => nextFloor ? "not queued" : "inactive",
         _ => "unknown",
     };
 }

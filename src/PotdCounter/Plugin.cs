@@ -27,6 +27,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly PotdReader reader;
     private readonly EnemyDeathObserver deaths;
     private readonly SettingsWindow settings;
+    private readonly CounterWindow counter;
     private readonly List<string> registeredCommands = [];
     private long nextRead;
     private long freshEntranceUntil;
@@ -40,6 +41,11 @@ public sealed class Plugin : IDalamudPlugin
     internal bool CounterAvailable => deaths.Available && !deaths.Faulted;
     internal string ReaderStatus { get; private set; } = "waiting for PotD";
 
+    internal bool IsSimulated => !Tracker.Visible && Preview && CanPreview;
+    internal CounterDisplay Display => IsSimulated ? PreviewData.Snapshot : new(
+        Tracker.Visible ? Tracker.Floor : 0, Tracker.Kills, Tracker.FlightHere, Tracker.FlightNext,
+        Tracker.PassageOpen, Tracker.CountComplete, CounterAvailable);
+
     public Plugin()
     {
         Config = PluginInterface.GetPluginConfig() as Configuration ?? new();
@@ -47,7 +53,8 @@ public sealed class Plugin : IDalamudPlugin
         reader = new(Client, Condition, Party);
         deaths = new(Objects, reader, Interop, Log);
         settings = new(this);
-        windows.AddWindow(new CounterWindow(this));
+        counter = new(this);
+        windows.AddWindow(counter);
         windows.AddWindow(settings);
         foreach (var command in new[] { "/potd", "/potdcount" })
         {
@@ -171,5 +178,6 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi -= OpenSettings;
         foreach (var command in registeredCommands) Commands.RemoveHandler(command);
         windows.RemoveAllWindows();
+        counter.Dispose();
     }
 }

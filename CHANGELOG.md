@@ -1,5 +1,18 @@
 # little changes
 
+## 0.1.2.0 · read the state, keep moving
+
+- the approved Watch-inspired HUD replaces the two-column layout
+- crisp, bold kills left take the main spot, a confirmed passage shows `OPEN` with a checkmark
+- explicit `ACTIVE`, `INACTIVE` and `UNKNOWN` Flight badges stay in one place
+- next-floor Flight and boss notices have their own reserved space
+- floor 1 gets `FIRST FLOOR:` / `Flight Unavailable`, floor 199 points to completion
+- observed counts and full ranges move to **run details** in `/potd`
+- 15 native preview examples include the approved designs and uncertain states
+- saved placement, lock and opacity stay yours, `/potdcount` still works
+
+counting and Flight timing are unchanged, the new native appearance still needs its in-game review
+
 ## 0.1.1.0 · a little more room to breathe
 
 - `/potd` opens settings now too, with the same `preview` and `toggle` options as `/potdcount`

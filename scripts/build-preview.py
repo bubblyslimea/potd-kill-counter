@@ -1,103 +1,148 @@
-"""Regenerate labelled layout studies from the real C# presentation fixtures."""
+"""Regenerate labelled studies from the same C# examples used by /potd preview.
+
+Requires fonttools only for converting the embedded headline font into SVG outlines.
+"""
 from pathlib import Path
+import base64
 import html
 import json
 import sys
+from fontTools.ttLib import TTFont
+from fontTools.pens.svgPathPen import SVGPathPen
 
 root = Path(__file__).resolve().parents[1]
 scenes = json.loads(Path(sys.argv[1]).read_text())
+font = TTFont(root / "assets/CounterHeadline.ttf")
+cmap = font.getBestCmap()
+glyphs = font.getGlyphSet()
+font_scale = 80 / (font["hhea"].ascent - font["hhea"].descent)
+font_css_size = font_scale * font["head"].unitsPerEm
+colors = ["#f7f7fc", "#66fab0", "#ffcf4a", "#e0b8ff", "#66d6ff"]
+fills = {0: "#2b3038", 2: "#45381f", 3: "#3b2154"}
+
 template = """<!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Riri's PotD Counter · layout preview</title>
+<title>Riri's PotD Counter · HUD preview</title>
 <style>
-:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#15151b;color:#f5f2f7}
-*{box-sizing:border-box}body{margin:0;padding:40px 24px}main{max-width:820px;margin:auto}
-.eyebrow{color:#fab8d1;font-size:13px}h1{font-size:32px;font-weight:600;letter-spacing:-.03em;margin:12px 0}
-p{color:#b8b5c2;line-height:1.6;font-size:14px}.stage{display:flex;justify-content:center;align-items:center;min-height:340px;padding:30px 12px;margin:26px 0;background:#20202a;border:1px solid #38333e;border-radius:16px}
-.hud{width:320px;padding:14px 16px;border:1px solid #4d4552;border-radius:10px;background:#1a1a21;font-size:16px}
-.context{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:14px}.floor{color:#fab8d1}.observed{color:#b8b5c2}
-.answer{margin:14px 0 12px}.main{font-size:22px;line-height:1.3}.main.number{font-size:32px}.caption{font-size:15px;color:#b8b5c2;margin-top:5px}
-.tone-1{color:#85e6b8}.tone-2{color:#ffcf75}
-.flight{border-top:1px solid #48404d;padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.flight .label{font-size:13px;color:#b8b5c2;margin-bottom:5px}.flight .off{color:#b8b5c2}.flight .on{color:#85e6b8}.flight .unknown{color:#ffcf75}
-details{margin-top:13px}summary{color:#fab8d1;font-size:14px;cursor:pointer;list-style:none}summary:focus-visible{outline:2px solid #fab8d1;outline-offset:4px}.details-text{font-size:14px;line-height:1.5;margin:10px 0 0}
-.controls{display:flex;flex-wrap:wrap;gap:8px}button{background:#25232c;border:1px solid #49414f;color:#dad4e0;padding:9px 12px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}button[aria-pressed=true]{background:#48323e;border-color:#c68da5;color:#ffe9f2}button:focus-visible{outline:2px solid #fab8d1;outline-offset:3px}
-[hidden]{display:none!important}.foot{font-size:12px}@media(max-width:420px){body{padding:24px 12px}h1{font-size:27px}.stage{padding:24px 8px}.hud{max-width:100%}}
+@font-face{font-family:CounterHeadline;src:url(data:font/ttf;base64,FONT_BASE64) format('truetype');font-weight:700}
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#16181d;color:#f7f7fc}
+*{box-sizing:border-box}body{margin:0;padding:36px 16px}main{max-width:860px;margin:auto}
+.eyebrow{color:#e0b8ff;font-size:13px}h1{font-size:34px;letter-spacing:-.04em;margin:12px 0}
+p{color:#b9bdc7;line-height:1.6;font-size:14px}.stage{display:grid;place-items:center;min-height:310px;margin:24px 0;background:#22262c;border:1px solid #3c4149;border-radius:20px}
+.hud{position:relative;width:320px;height:232px;background:#0e1112;border:1px solid #424a4f;border-radius:18px;flex:none}
+.hud.ready{border:2px solid #66fab0}.floor{position:absolute;left:17px;top:11px;font-size:18px}
+.answer{position:absolute;top:31px;left:0;width:100%;height:80px;display:flex;justify-content:center;align-items:center}
+.headline{font:700 FONT_SIZEpx/80px CounterHeadline, sans-serif;white-space:nowrap}
+.check{width:29px;height:29px;margin-left:13px;stroke:#66fab0;stroke-width:5;fill:none;overflow:visible}
+.caption{position:absolute;top:107px;width:100%;text-align:center;font-size:20px;line-height:24px}
+.badge{position:absolute;top:139px;left:50%;transform:translateX(-50%);height:40px;min-width:198px;padding:0 18px;border:1px solid #646a74;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:18px;white-space:nowrap;background:#2b3038;line-height:22px}
+.badge.first{width:230px;flex-direction:column;gap:0;padding:0;line-height:18px}.badge.first .status{font-size:16px;line-height:17px}.badge .detail{margin-left:10px}.badge.first .detail{margin-left:0}
+.notice{position:absolute;top:186px;width:100%;font-size:16px;text-align:center;line-height:20px;white-space:nowrap}
+.controls{display:flex;flex-wrap:wrap;gap:8px}button{font:inherit;font-size:13px;color:#eee;background:#242832;border:1px solid #484e5a;padding:8px 12px;border-radius:8px;cursor:pointer}button[aria-pressed=true]{border-color:#e0b8ff;background:#3b2154}button:focus-visible,summary:focus-visible{outline:2px solid #66d6ff;outline-offset:4px}
+details{margin-top:24px}summary{cursor:pointer;color:#e0b8ff}.foot{font-size:12px}[hidden]{display:none!important}
+@media(max-width:360px){body{padding:24px 8px}.stage{margin-left:-8px;margin-right:-8px}}
 </style>
-<main>
-<div class="eyebrow">Riri's PotD Counter · 0.1.1</div>
-<h1>a little more room to breathe</h1>
-<p>one main answer, a little Flight reminder, and details when you want them</p>
-<p class="foot">layout study · pretend values · this is not an in-game capture</p>
-<section class="stage" aria-label="Simulated overlay">
-<div class="hud">
-<div class="context"><span class="floor" id="floor"></span><span class="observed" id="observed"></span></div>
-<div class="answer" role="status" aria-live="polite"><div id="main" class="main"></div><div id="caption" class="caption"></div></div>
-<div class="flight" id="flight"><div><div class="label">Flight this floor</div><div id="here"></div></div><div><div class="label">Flight next floor</div><div id="next"></div></div></div>
-<details id="details"><summary id="detail-label">details</summary><p id="range" class="details-text"></p><p id="note" class="details-text"></p><p id="flight-note" class="details-text">Flight used here helps on the next floor</p></details>
-</div></section>
-<nav class="controls" id="controls" aria-label="Example states"></nav>
-<p class="foot">open /potd for settings · /potdcount still works too<br>these examples use the counter's real presentation model, the native font follows Dalamud</p>
-</main>
+<main><div class="eyebrow">Riri's PotD Counter · 0.1.2</div><h1>read the state, keep moving</h1>
+<p>the count up front, Flight where you expect it, details in /potd when you need them</p>
+<p class="foot">layout study · simulated values · not an in-game capture</p>
+<section class="stage" aria-label="Simulated HUD"><div class="hud" id="hud">
+<div class="floor" id="floor"></div>
+<div class="answer"><span class="headline" id="headline"></span><svg class="check" id="check" viewBox="0 0 29 29" aria-hidden="true"><path d="M0 15L9 24L29 1"/></svg></div>
+<div class="caption" id="caption"></div>
+<div class="badge" id="badge"><span class="status" id="status"></span><span class="detail" id="detail"></span></div>
+<div class="notice" id="next"></div><div class="notice" id="destination"></div>
+</div></section><nav class="controls" id="controls" aria-label="Example states"></nav>
+<details><summary>run details · these live in /potd settings</summary><p id="observed"></p><p id="range"></p><p id="note"></p></details>
+<p class="foot">these examples come from the plugin's actual presentation model<br>the headline uses the shipped font, supporting text approximates Dalamud's font</p></main>
 <script>
-const scenes=SCENES_JSON;
+const scenes=SCENES_JSON,colors=COLORS_JSON,fills=FILLS_JSON;
 const $=id=>document.getElementById(id);
 function show(s){
-  const v=s.view;
-  $('floor').textContent='floor '+s.floor;
-  $('observed').textContent=v.Observed||'';
-  $('main').textContent=v.Main;
-  $('main').className='main tone-'+v.Tone+(v.IsEstimate?' number':'');
-  $('caption').textContent=v.Caption;
-  $('flight').hidden=!v.ShowFlight;
-  $('here').textContent=s.hereLabel;
-  $('next').textContent=s.nextLabel;
-  $('here').className=s.here.toLowerCase();
-  $('next').className=s.next.toLowerCase();
-  $('range').textContent=v.Range||'';
-  $('range').hidden=!v.Range;
-  $('note').textContent=v.Note;
-  $('flight-note').hidden=!v.ShowFlight;
-  document.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===s.id)));
+ const v=s.view,b=v.Flight;
+ $('floor').textContent='floor '+s.floor;
+ $('headline').textContent=v.Main;$('headline').style.color=colors[v.Tone];
+ $('check').hidden=v.Main!=='OPEN';$('hud').classList.toggle('ready',v.Tone===1);
+ $('caption').textContent=v.Caption;$('caption').style.fontSize=v.Caption.length>22?'16px':'20px';
+ $('badge').hidden=!v.ShowFlight;$('badge').classList.toggle('first',b.TwoLines);
+ $('badge').style.color=colors[b.Tone];$('badge').style.background=fills[b.Tone]||fills[0];
+ $('status').textContent=b.Status;$('detail').textContent=b.Detail;
+ $('next').textContent=v.NextFlightNotice||'';$('next').style.color=colors[v.NextFlightTone];
+ $('destination').textContent=v.DestinationNotice||'';$('destination').style.color=colors[2];
+ $('destination').style.top=v.NextFlightNotice?'206px':'186px';
+ $('observed').textContent=v.Observed||'';$('range').textContent=v.Range||'';$('note').textContent=v.Note;
+ document.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===s.id)));
 }
-$('details').addEventListener('toggle',()=>{$('detail-label').textContent=$('details').open?'less detail':'details'});
-for(const s of scenes){
-  const b=document.createElement('button');
-  b.textContent=s.label;
-  b.dataset.id=s.id;
-  b.addEventListener('click',()=>show(s));
-  $('controls').appendChild(b);
-}
+for(const s of scenes){const b=document.createElement('button');b.textContent=s.label;b.dataset.id=s.id;b.addEventListener('click',()=>show(s));$('controls').appendChild(b)}
 show(scenes[0]);
 </script></html>
 """
-(root / "PREVIEW.html").write_text(template.replace("SCENES_JSON", json.dumps(scenes, ensure_ascii=False)), encoding="utf-8")
-colors = ["#f5f2f7", "#85e6b8", "#ffcf75"]
-def text(x, y, value, size=14, color="#b8b5c2", anchor=None):
-    alignment = f' text-anchor="{anchor}"' if anchor else ""
-    return f'<text x="{x}" y="{y}" fill="{color}" font-size="{size}"{alignment}>{html.escape(value)}</text>'
-parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="430" viewBox="0 0 1080 430">',
-         '<rect width="1080" height="430" rx="18" fill="#15151b"/>',
+for key, value in {
+    "FONT_BASE64": base64.b64encode((root / "assets/CounterHeadline.ttf").read_bytes()).decode(),
+    "FONT_SIZE": str(font_css_size),
+    "SCENES_JSON": json.dumps(scenes, ensure_ascii=False),
+    "COLORS_JSON": json.dumps(colors),
+    "FILLS_JSON": json.dumps(fills),
+}.items():
+    template = template.replace(key, value)
+(root / "PREVIEW.html").write_text(template, encoding="utf-8")
+
+def text(x, y, value, size=16, color="#b9bdc7", center=False):
+    align = ' text-anchor="middle"' if center else ""
+    return f'<text x="{x}" y="{y}" fill="{color}" font-size="{size}"{align}>{html.escape(value)}</text>'
+
+def headline(value, color):
+    # ImGui advances glyphs without font kerning; match that in the outlined preview.
+    advances = [font["hmtx"][cmap[ord(c)]][0] for c in value]
+    width = sum(advances) * font_scale
+    extra = 42 if value == "OPEN" else 0
+    if width + extra > 288:
+        raise ValueError("headline exceeds HUD safe width: " + value)
+    x = (320 - width - extra) / 2
+    parts = []
+    for ch, advance in zip(value, advances):
+        pen = SVGPathPen(glyphs)
+        glyphs[cmap[ord(ch)]].draw(pen)
+        parts.append(f'<path d="{pen.getCommands()}" fill="{color}" transform="translate({x:.3f} 96) scale({font_scale:.6f} {-font_scale:.6f})"/>')
+        x += advance * font_scale
+    if value == "OPEN":
+        parts.append(f'<path d="M{x+13:.3f} 70l9 9l20 -23" stroke="{colors[1]}" stroke-width="5" fill="none"/>')
+    return parts
+
+# Exercise every fixture's real headline, including states outside the six-card overview.
+for s in scenes:
+    headline(s["view"]["Main"], colors[s["view"]["Tone"]])
+
+parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="720" viewBox="0 0 1080 720">',
+         '<rect width="1080" height="720" rx="18" fill="#16181d"/>',
          '<g font-family="DejaVu Sans,Arial,sans-serif">',
-         text(36, 48, "Riri's PotD Counter", 25, "#f5f2f7"),
-         text(36, 79, "a little more room to breathe", 16, "#fab8d1")]
-for x, scene_id in zip([36, 380, 724], ["normal", "open", "partial"]):
+         text(36, 49, "Riri's PotD Counter", 28, "#f7f7fc"),
+         text(36, 80, "read the state, keep moving", 17, "#e0b8ff")]
+for index, scene_id in enumerate(["first", "flight", "normal", "both", "boss-next", "open"]):
     s = next(s for s in scenes if s["id"] == scene_id)
-    v = s["view"]
-    parts += [f'<g transform="translate({x} 111)">',
-              '<rect width="320" height="238" rx="10" fill="#1a1a21" stroke="#4d4552"/>',
-              text(16, 30, f'floor {s["floor"]}', color="#fab8d1"),
-              text(304, 30, v["Observed"] or "", anchor="end"),
-              text(16, 86, v["Main"], 34 if v["IsEstimate"] else 23, colors[v["Tone"]]),
-              text(16, 113, v["Caption"], 15),
-              '<path d="M16 135H304" stroke="#48404d"/>',
-              text(16, 160, "Flight this floor", 13),
-              text(164, 160, "Flight next floor", 13)]
-    for cx, label, state in [(16, s["hereLabel"], s["here"]), (164, s["nextLabel"], s["next"])]:
-        parts.append(text(cx, 186, label, 16, {"On":"#85e6b8","Off":"#b8b5c2","Unknown":"#ffcf75"}[state]))
-    parts += [text(16, 220, "details", 14, "#fab8d1"), "</g>"]
-parts += [text(36, 387, "layout preview · simulated values · not an in-game capture", 13),
-          text(36, 410, "/potd opens settings · /potdcount still works too", 13, "#c9a8b9"),
+    v, x, y = s["view"], 36 + (index % 3) * 344, 128 + (index // 3) * 280
+    b = v["Flight"]
+    parts += [text(x, y - 14, s["label"], 15),
+              f'<g transform="translate({x} {y})">',
+              f'<rect x="1" y="1" width="318" height="230" rx="18" fill="#0e1112" stroke="{colors[1] if v["Tone"] == 1 else "#424a4f"}" stroke-width="{2 if v["Tone"] == 1 else 1}"/>',
+              text(18, 29, f'floor {s["floor"]}', 18, colors[0])]
+    parts += headline(v["Main"], colors[v["Tone"]])
+    parts += [text(160, 126, v["Caption"], 20, colors[0], True)]
+    bw = 230 if b["TwoLines"] else 218
+    parts += [f'<rect x="{160-bw/2}" y="140" width="{bw}" height="40" rx="20" fill="{fills.get(b["Tone"], fills[0])}" stroke="{colors[b["Tone"]]}" stroke-opacity=".35"/>']
+    if b["TwoLines"]:
+        parts += [text(160, 155, b["Status"], 16, colors[b["Tone"]], True),
+                  text(160, 174, b["Detail"], 18, colors[b["Tone"]], True)]
+    else:
+        parts += [text(160, 167, b["Status"]+"  "+b["Detail"], 18, colors[b["Tone"]], True)]
+    ny = 202
+    if v["NextFlightNotice"]:
+        parts += [text(160, ny, v["NextFlightNotice"], 16, colors[v["NextFlightTone"]], True)]
+        ny += 20
+    if v["DestinationNotice"]:
+        parts += [text(160, ny, v["DestinationNotice"], 16, colors[2], True)]
+    parts += ["</g>"]
+parts += [text(36, 681, "layout study · simulated values · not an in-game capture", 13),
+          text(36, 704, "/potd opens settings · /potd preview tries these states in the native HUD", 13, "#e0b8ff"),
           "</g></svg>"]
 (root / "assets/counter-preview.svg").write_text("\n".join(parts)+"\n", encoding="utf-8")
-print(f"refreshed layout studies from {len(scenes)} C# presentation states")
+print(f"refreshed layout studies; {len(scenes)} real presentation states fit the headline band")

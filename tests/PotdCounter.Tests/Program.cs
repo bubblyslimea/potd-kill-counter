@@ -125,7 +125,7 @@ Check(PassageEstimator.Estimate(200, 0, KnownState.On, true, true).Kind == Estim
 
 // The compact view must never hide uncertainty or manufacture progress.
 var view = CounterPresentation.Create(193, 4, KnownState.Off, false, true);
-Check(view.IsEstimate && view.Main == "~1–9" && view.Caption == "estimated kills left",
+Check(view.IsEstimate && view.Main == "~1–9" && view.Caption == "kills left",
     "normal card separates an approximate remaining range from its unit");
 Check(view.Observed == "4 kills observed" && view.Range!.Contains("5–13"),
     "observed kills stay distinct from the total target");
@@ -141,20 +141,20 @@ Check(CounterPresentation.FlightLabel(KnownState.On) == "active" &&
       CounterPresentation.FlightLabel(KnownState.Unknown, true) == "unknown",
     "Flight wording distinguishes current, next and unknown states");
 view = CounterPresentation.Create(193, 13, KnownState.Off, false, true);
-Check(!view.IsEstimate && view.Main == "check the passage" && view.Tone == CounterTone.Attention,
+Check(!view.IsEstimate && view.Main == "CHECK" && view.Tone == CounterTone.Attention,
     "the range ceiling never presents an open passage");
 view = CounterPresentation.Create(193, 4, KnownState.Off, false, true, false);
-Check(!view.IsEstimate && view.Observed is null && view.Main == "tracking paused",
+Check(!view.IsEstimate && view.Observed is null && view.Main == "?" && view.Caption == "tracking unavailable",
     "unavailable observer cannot present a trustworthy count or remainder");
 foreach (var available in new[] { false, true })
 foreach (var complete in new[] { false, true })
 {
     view = CounterPresentation.Create(193, 100, KnownState.Unknown, true, complete, available);
-    Check(view.Main == "passage open" && view.Tone == CounterTone.Ready && !view.IsEstimate,
+    Check(view.Main == "OPEN" && view.Tone == CounterTone.Ready && !view.IsEstimate,
         "confirmed passage wins over every observer and confidence state");
 }
 view = CounterPresentation.Create(190, 0, KnownState.On, false, true, false);
-Check(view.Main == "boss floor" && view.Observed is null && view.Range is null,
+Check(view.Main == "BOSS" && view.Observed is null && view.Range is null,
     "boss floors retain their own state even when counting is unavailable");
 view = CounterPresentation.Create(200, 0, KnownState.Unknown, true, false, false);
 Check(view.Tone == CounterTone.Ready && !view.ShowFlight && view.Range is null,
@@ -162,34 +162,78 @@ Check(view.Tone == CounterTone.Ready && !view.ShowFlight && view.Range is null,
 view = CounterPresentation.Create(0, 0, KnownState.Unknown, false, false);
 Check(!view.ShowFlight && !view.IsEstimate && view.Observed is null, "outside view has no stale floor facts");
 
+// Explicit boundary expectations guard the meaning of the new badges and notices.
+var boundaries = new[]
+{
+    (Floor: 0, Show: false, First: false, Destination: (string?)null),
+    (Floor: 1, Show: true, First: true, Destination: (string?)null),
+    (Floor: 2, Show: true, First: false, Destination: (string?)null),
+    (Floor: 9, Show: true, First: false, Destination: (string?)"BOSS NEXT FLOOR"),
+    (Floor: 10, Show: true, First: false, Destination: (string?)null),
+    (Floor: 11, Show: true, First: false, Destination: (string?)null),
+    (Floor: 19, Show: true, First: false, Destination: (string?)"BOSS NEXT FLOOR"),
+    (Floor: 51, Show: true, First: false, Destination: (string?)null),
+    (Floor: 189, Show: true, First: false, Destination: (string?)"BOSS NEXT FLOOR"),
+    (Floor: 190, Show: true, First: false, Destination: (string?)null),
+    (Floor: 191, Show: true, First: false, Destination: (string?)null),
+    (Floor: 199, Show: true, First: false, Destination: (string?)"FINAL FLOOR NEXT"),
+    (Floor: 200, Show: false, First: false, Destination: (string?)null),
+};
+foreach (var expected in boundaries)
+{
+    view = CounterPresentation.Create(expected.Floor, 0, KnownState.Off, false, true, next: KnownState.Off);
+    Check(view.ShowFlight == expected.Show && view.Flight.TwoLines == expected.First &&
+          view.DestinationNotice == expected.Destination, $"HUD floor boundary {expected.Floor}");
+}
+var currentStates = new[]
+{
+    (State: KnownState.Off, Text: "INACTIVE", Tone: CounterTone.Neutral),
+    (State: KnownState.On, Text: "ACTIVE", Tone: CounterTone.Active),
+    (State: KnownState.Unknown, Text: "UNKNOWN", Tone: CounterTone.Attention),
+};
+var nextStates = new[]
+{
+    (State: KnownState.Off, Text: (string?)null, Tone: CounterTone.Attention),
+    (State: KnownState.On, Text: (string?)"NEXT FLOOR: Flight activated", Tone: CounterTone.Future),
+    (State: KnownState.Unknown, Text: (string?)"NEXT FLOOR: Flight unknown", Tone: CounterTone.Attention),
+};
+foreach (var here in currentStates)
+foreach (var next in nextStates)
+{
+    view = CounterPresentation.Create(193, 0, here.State, false, true, next: next.State);
+    Check(view.Flight.Status == here.Text && view.Flight.Tone == here.Tone &&
+          view.NextFlightNotice == next.Text && view.NextFlightTone == next.Tone,
+        "current and next Flight retain independent text and colors");
+}
+view = CounterPresentation.Create(1, 0, KnownState.Unknown, false, false);
+Check(view.Flight.Status == "UNKNOWN" && !view.Flight.TwoLines && view.Main == "?",
+    "late attachment on floor 1 never manufactures certainty");
+view = CounterPresentation.Create(200, 0, KnownState.On, true, true, next: KnownState.On);
+Check(view.Main == "CLEAR" && view.NextFlightNotice is null, "completion has no queued Flight destination");
+view = CounterPresentation.Create(1, 0, KnownState.Off, false, true, next: KnownState.On);
+Check(view.Flight.Status == "FIRST FLOOR:" && view.Flight.Detail == "Flight Unavailable" &&
+      view.NextFlightNotice == "NEXT FLOOR: Flight activated", "floor 1 can queue a pomander without an incoming effect");
+view = CounterPresentation.Create(189, 2, KnownState.On, false, true, next: KnownState.On);
+Check(view.Flight.Tone == CounterTone.Active && view.NextFlightTone == CounterTone.Future &&
+      view.NextFlightNotice is not null && view.DestinationNotice == "BOSS NEXT FLOOR",
+    "active, queued and boss information coexist");
+foreach (var example in CounterExamples.All)
+{
+    view = example.State.Presentation;
+    Check(view.Main.Length <= 5, "headline stays glanceable");
+    Check(view.Caption.Length <= 24, "visible caveat fits the caption band");
+    Check(!view.IsEstimate || view.Main.StartsWith('~'), "numeric estimates always approximate");
+}
+
 Console.WriteLine($"PASS: {checks} assertions; all 200 floors, Flight, deaths, transitions, uncertainty, passage priority and presentation.");
 
-// Optional review fixtures are produced by the actual estimator, not a JavaScript copy.
+// Shared examples drive native preview controls and the external labelled studies.
 if (args.Length == 2 && args[0] == "--export-preview")
 {
-    var scenes = new[]
+    var scenes = CounterExamples.All.Select(s => new
     {
-        (Id: "normal", Label: "normal floor", Floor: 193, Kills: 4, Here: KnownState.Off, Next: KnownState.On, Open: false, Full: true, Available: true),
-        (Id: "flight", Label: "Flight active", Floor: 193, Kills: 4, Here: KnownState.On, Next: KnownState.Off, Open: false, Full: true, Available: true),
-        (Id: "open", Label: "passage open", Floor: 193, Kills: 7, Here: KnownState.Off, Next: KnownState.On, Open: true, Full: true, Available: true),
-        (Id: "partial", Label: "partial count", Floor: 193, Kills: 3, Here: KnownState.Unknown, Next: KnownState.Off, Open: false, Full: false, Available: true),
-        (Id: "unknown", Label: "unknown Flight", Floor: 193, Kills: 4, Here: KnownState.Unknown, Next: KnownState.Unknown, Open: false, Full: true, Available: true),
-        (Id: "exceeded", Label: "range exceeded", Floor: 193, Kills: 13, Here: KnownState.Off, Next: KnownState.Off, Open: false, Full: true, Available: true),
-        (Id: "paused", Label: "tracking paused", Floor: 193, Kills: 0, Here: KnownState.Off, Next: KnownState.Off, Open: false, Full: false, Available: false),
-        (Id: "boss", Label: "boss floor", Floor: 190, Kills: 0, Here: KnownState.Off, Next: KnownState.Off, Open: false, Full: true, Available: true),
-        (Id: "complete", Label: "floor 200", Floor: 200, Kills: 0, Here: KnownState.Off, Next: KnownState.Off, Open: true, Full: true, Available: true),
-    }.Select(s => new
-    {
-        id = s.Id, label = s.Label, floor = s.Floor, kills = s.Kills,
-        here = s.Here.ToString(), next = s.Next.ToString(), full = s.Full,
-        normalFloor = FloorRules.Kind(s.Floor) == FloorKind.Normal,
-        headline = PassageEstimator.Estimate(s.Floor, s.Kills, s.Here, s.Open, s.Full).Headline,
-        kind = PassageEstimator.Estimate(s.Floor, s.Kills, s.Here, s.Open, s.Full).Kind.ToString(),
-        normal = FloorRules.NormalRange(s.Floor)?.ToString(),
-        flight = FloorRules.NormalRange(s.Floor)?.WithFlight().ToString(),
-        hereLabel = CounterPresentation.FlightLabel(s.Here),
-        nextLabel = CounterPresentation.FlightLabel(s.Next, true),
-        view = CounterPresentation.Create(s.Floor, s.Kills, s.Here, s.Open, s.Full, s.Available),
+        id = s.Id, label = s.Label, floor = s.State.Floor,
+        view = s.State.Presentation,
     });
     File.WriteAllText(args[1], System.Text.Json.JsonSerializer.Serialize(scenes));
 }

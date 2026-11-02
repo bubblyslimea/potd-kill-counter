@@ -1,10 +1,10 @@
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
-    <Version>0.1.1.0</Version>
+    <Version>0.1.2.0</Version>
     <Author>Riri Fujiwara</Author>
     <Name>Riri's PotD Counter</Name>
     <Punchline>a little counter for the climb</Punchline>
-    <Description>by Riri Fujiwara&#10;&#10;keeps track of the kills you see, your Flight pomanders, and roughly how much might be left&#10;&#10;open /potdcount to make yourself comfortable&#10;&#10;an early alpha for testing, live PotD checks are still pending</Description>
+    <Description>by Riri Fujiwara&#10;&#10;keeps track of the kills you see, your Flight pomanders, and roughly how much might be left&#10;&#10;open /potd to make yourself comfortable&#10;&#10;a testing build with a new glanceable HUD, the first alpha has a positive live PotD report</Description>
     <RepoUrl>https://github.com/bubblyslimea/potd-kill-counter</RepoUrl>
     <AcceptsFeedback>false</AcceptsFeedback>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -16,5 +16,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../PotdCounter.Core/*.cs" Link="Core/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../assets/CounterHeadline.ttf" LogicalName="PotdCounter.Headline.ttf" />
   </ItemGroup>
 </Project>

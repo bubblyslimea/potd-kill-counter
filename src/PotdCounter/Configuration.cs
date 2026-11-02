@@ -10,5 +10,5 @@ public sealed class Configuration : IPluginConfiguration
     public bool Locked;
     public bool ShowRanges = true;
     public bool ShowDetails;
-    public float BackgroundOpacity = 0.88f;
+    public float BackgroundOpacity = 0.96f;
 }

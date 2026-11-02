@@ -1,145 +1,89 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.ManagedFontAtlas;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using PotdCounter.Core;
 
 namespace PotdCounter.UI;
 
-internal sealed class PreviewState
+internal sealed class CounterWindow : Window, IDisposable
 {
-    public int Floor = 193;
-    public int Kills = 4;
-    public KnownState Flight = KnownState.Off;
-    public KnownState Queued = KnownState.On;
-    public bool PassageOpen;
-    public bool Partial;
-    public bool Unavailable;
-}
-
-internal sealed class CounterWindow : Window
-{
-    private static readonly Vector4 Pink = new(0.98f, 0.72f, 0.82f, 1);
-    private static readonly Vector4 Green = new(0.52f, 0.90f, 0.72f, 1);
-    private static readonly Vector4 Amber = new(1f, 0.81f, 0.46f, 1);
-    private static readonly Vector4 Muted = new(0.72f, 0.71f, 0.76f, 1);
+    private const float Width = 320;
+    private const float Height = 232;
+    private static readonly Vector4 White = new(0.97f, 0.97f, 0.99f, 1);
+    private static readonly Vector4 Green = new(0.40f, 0.98f, 0.69f, 1);
+    private static readonly Vector4 Amber = new(1f, 0.81f, 0.29f, 1);
+    private static readonly Vector4 Lavender = new(0.88f, 0.72f, 1f, 1);
+    private static readonly Vector4 Blue = new(0.40f, 0.84f, 1f, 1);
     private readonly Plugin plugin;
+    private readonly HudFonts fonts;
 
     public CounterWindow(Plugin plugin) : base("Riri's PotD Counter###PotdCounterLive")
     {
         this.plugin = plugin;
+        fonts = new(Plugin.PluginInterface.UiBuilder.FontAtlas);
         IsOpen = true;
         ShowCloseButton = false;
         RespectCloseHotkey = false;
         Position = new Vector2(30, 180);
         PositionCondition = ImGuiCond.FirstUseEver;
-        SizeConstraints = new WindowSizeConstraints
-        {
-            MinimumSize = new Vector2(320, 0),
-            MaximumSize = new Vector2(320, 900),
-        };
+        SizeCondition = ImGuiCond.Always;
     }
 
     public override bool DrawConditions() =>
-        plugin.Config.ShowOverlay && (plugin.Tracker.Visible || (plugin.Preview && plugin.CanPreview));
+        plugin.Config.ShowOverlay && (plugin.Tracker.Visible || plugin.IsSimulated);
 
     public override void PreDraw()
     {
-        Flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysAutoResize |
-                ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav |
-                ImGuiWindowFlags.NoScrollbar;
+        Size = new Vector2(Width, Height + (plugin.IsSimulated ? 24 : 0));
+        Flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoBackground |
+                ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
         if (plugin.Config.Locked) Flags |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoInputs;
-        ImGui.SetNextWindowBgAlpha(plugin.Config.BackgroundOpacity);
-        var scale = ImGuiHelpers.GlobalScale;
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(16, 14) * scale);
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 10 * scale);
-        ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(10, 5) * scale);
-        ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(0.10f, 0.10f, 0.13f, 1));
-        ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0.30f, 0.27f, 0.32f, 1));
-        ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.96f, 0.95f, 0.97f, 1));
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, Vector2.Zero);
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
     }
 
-    public override void PostDraw()
-    {
-        ImGui.PopStyleColor(3);
-        ImGui.PopStyleVar(3);
-    }
+    public override void PostDraw() => ImGui.PopStyleVar(2);
 
     public override void Draw()
     {
-        var t = plugin.Tracker;
-        var simulated = !t.Visible && plugin.Preview && plugin.CanPreview;
-        var demo = plugin.PreviewData;
-        var floor = simulated ? demo.Floor : t.Floor;
-        var kills = simulated ? demo.Kills : t.Kills;
-        var here = simulated ? demo.Flight : t.FlightHere;
-        var next = simulated ? demo.Queued : t.FlightNext;
-        var complete = simulated ? !demo.Partial : t.CountComplete;
-        var available = simulated ? !demo.Unavailable : plugin.CounterAvailable;
-        var view = CounterPresentation.Create(floor, kills, here,
-            simulated ? demo.PassageOpen : t.PassageOpen, complete, available);
-
-        if (simulated) ImGui.TextColored(Amber, "simulation · pretend values");
-
-        var left = ImGui.GetCursorPosX();
-        var width = ImGui.GetContentRegionAvail().X;
-        var floorText = $"floor {floor}";
-        ImGui.TextColored(Pink, floorText);
-        if (view.Observed is { } observed)
+        var state = plugin.Display;
+        var view = state.Presentation;
+        var scale = ImGuiHelpers.GlobalScale;
+        var origin = ImGui.GetWindowPos();
+        var draw = ImGui.GetWindowDrawList();
+        if (plugin.IsSimulated)
         {
-            var right = left + width - ImGui.CalcTextSize(observed).X;
-            if (right > left + ImGui.CalcTextSize(floorText).X + 10 * ImGuiHelpers.GlobalScale)
-                ImGui.SameLine(right);
-            ImGui.TextColored(Muted, observed);
+            draw.AddRectFilled(origin, origin + new Vector2(Width, 22) * scale, Color(new(0.06f, 0.07f, 0.08f, 0.96f)), 5 * scale);
+            Text(fonts.Small, "simulation · pretend values", origin + new Vector2(Width / 2, 2) * scale, Amber, true);
+            origin.Y += 24 * scale;
         }
 
-        ImGui.Spacing();
-        var color = view.Tone switch
-        {
-            CounterTone.Ready => Green,
-            CounterTone.Attention => Amber,
-            _ => Vector4.One,
-        };
-        ImGui.PushStyleColor(ImGuiCol.Text, color);
-        ImGui.SetWindowFontScale(view.IsEstimate ? 2f : 1.35f);
-        ImGui.TextWrapped(view.Main);
-        ImGui.SetWindowFontScale(1f);
-        ImGui.PopStyleColor();
-        ImGui.TextColored(Muted, view.Caption);
+        var border = view.Tone == CounterTone.Ready ? Green : new Vector4(0.26f, 0.29f, 0.31f, 1);
+        draw.AddRectFilled(origin, origin + new Vector2(Width, Height) * scale,
+            Color(new(0.055f, 0.065f, 0.072f, plugin.Config.BackgroundOpacity)), 18 * scale);
+        draw.AddRect(origin + Vector2.One * scale, origin + new Vector2(Width - 1, Height - 1) * scale,
+            Color(border), 18 * scale, ImDrawFlags.None, (view.Tone == CounterTone.Ready ? 2 : 1) * scale);
+
+        Text(fonts.Body, $"floor {state.Floor}", origin + new Vector2(18, 12) * scale, White);
+        DrawHeadline(view, origin, scale);
+        Text(view.Caption.Length > 22 ? fonts.Small : fonts.Caption, view.Caption,
+            origin + new Vector2(Width / 2, 108) * scale, White, true);
 
         if (view.ShowFlight)
         {
-            ImGui.Spacing();
-            ImGui.Separator();
-            if (ImGui.BeginTable("FlightState", 2, ImGuiTableFlags.SizingStretchSame | ImGuiTableFlags.NoSavedSettings))
+            DrawBadge(view.Flight, origin, scale);
+            // Reserved lines keep independent observations visible without resizing the card.
+            var noticeY = 187f;
+            if (view.NextFlightNotice is { } next)
             {
-                ImGui.TableNextColumn();
-                ImGui.TextColored(Muted, "Flight this floor");
-                ImGui.TextColored(FlightColor(here), CounterPresentation.FlightLabel(here));
-                ImGui.TableNextColumn();
-                ImGui.TextColored(Muted, "Flight next floor");
-                ImGui.TextColored(FlightColor(next), CounterPresentation.FlightLabel(next, true));
-                ImGui.EndTable();
+                Text(fonts.Small, next, origin + new Vector2(Width / 2, noticeY) * scale, Tone(view.NextFlightTone), true);
+                noticeY += 20;
             }
-        }
-
-        ImGui.Spacing();
-        ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
-        ImGui.PushStyleColor(ImGuiCol.Text, Pink);
-        if (ImGui.SmallButton(plugin.Config.ShowDetails ? "less detail" : "details"))
-        {
-            plugin.Config.ShowDetails = !plugin.Config.ShowDetails;
-            plugin.Save();
-        }
-        ImGui.PopStyleColor(2);
-        if (plugin.Config.ShowDetails)
-        {
-            if (plugin.Config.ShowRanges && view.Range is { } range) ImGui.TextWrapped(range);
-            ImGui.TextWrapped(view.Note);
-            if (view.ShowFlight)
-                ImGui.TextWrapped("Flight used here helps on the next floor");
-            if (!complete && !simulated && available && FloorRules.Kind(floor) == FloorKind.Normal)
-                ImGui.TextWrapped(t.ConfidenceNote);
+            if (view.DestinationNotice is { } destination)
+                Text(fonts.Small, destination, origin + new Vector2(Width / 2, noticeY) * scale, Amber, true);
         }
 
         if (ImGui.BeginPopupContextWindow("PotdCounterMenu", ImGuiPopupFlags.MouseButtonRight))
@@ -149,10 +93,66 @@ internal sealed class CounterWindow : Window
         }
     }
 
-    private static Vector4 FlightColor(KnownState state) => state switch
+    private void DrawHeadline(CounterPresentation view, Vector2 origin, float scale)
     {
-        KnownState.On => Green,
-        KnownState.Unknown => Amber,
-        _ => Muted,
+        using var font = fonts.Headline.Push();
+        var size = ImGui.CalcTextSize(view.Main);
+        var isOpen = view.Main == "OPEN";
+        var extra = isOpen ? 42 * scale : 0;
+        var position = origin + new Vector2((Width * scale - size.X - extra) / 2, 32 * scale);
+        ImGui.GetWindowDrawList().AddText(position, Color(Tone(view.Tone)), view.Main);
+        if (!isOpen) return;
+        var check = new Vector2(position.X + size.X + 13 * scale, origin.Y + 70 * scale);
+        var draw = ImGui.GetWindowDrawList();
+        draw.AddLine(check, check + new Vector2(9, 9) * scale, Color(Green), 5 * scale);
+        draw.AddLine(check + new Vector2(9, 9) * scale, check + new Vector2(29, -14) * scale, Color(Green), 5 * scale);
+    }
+
+    private void DrawBadge(FlightBadge badge, Vector2 origin, float scale)
+    {
+        var draw = ImGui.GetWindowDrawList();
+        var tint = Tone(badge.Tone);
+        var fill = badge.Tone switch
+        {
+            CounterTone.Active => new Vector4(0.23f, 0.13f, 0.33f, 1),
+            CounterTone.Attention => new Vector4(0.27f, 0.22f, 0.12f, 1),
+            _ => new Vector4(0.17f, 0.19f, 0.22f, 1),
+        };
+        float textWidth;
+        using (fonts.Body.Push()) textWidth = ImGui.CalcTextSize(badge.Status + "  " + badge.Detail).X;
+        var width = badge.TwoLines ? 230 * scale : Math.Max(198 * scale, textWidth + 36 * scale);
+        var left = origin + new Vector2((Width * scale - width) / 2, 140 * scale);
+        draw.AddRectFilled(left, left + new Vector2(width, 40 * scale), Color(fill), 20 * scale);
+        draw.AddRect(left, left + new Vector2(width, 40 * scale), Color(new(tint.X, tint.Y, tint.Z, 0.35f)), 20 * scale);
+        if (badge.TwoLines)
+        {
+            Text(fonts.Small, badge.Status, origin + new Vector2(Width / 2, 140) * scale, tint, true);
+            Text(fonts.Body, badge.Detail, origin + new Vector2(Width / 2, 157) * scale, tint, true);
+        }
+        else
+        {
+            Text(fonts.Body, badge.Status + "  " + badge.Detail,
+                origin + new Vector2(Width / 2, 148) * scale, tint, true);
+        }
+    }
+
+    private static void Text(IFontHandle font, string text, Vector2 position, Vector4 color, bool centered = false)
+    {
+        using var scope = font.Push();
+        if (centered) position.X -= ImGui.CalcTextSize(text).X / 2;
+        position = new Vector2(MathF.Round(position.X), MathF.Round(position.Y));
+        ImGui.GetWindowDrawList().AddText(position, Color(color), text);
+    }
+
+    private static Vector4 Tone(CounterTone tone) => tone switch
+    {
+        CounterTone.Ready => Green,
+        CounterTone.Attention => Amber,
+        CounterTone.Active => Lavender,
+        CounterTone.Future => Blue,
+        _ => White,
     };
+
+    private static uint Color(Vector4 color) => ImGui.ColorConvertFloat4ToU32(color);
+    public void Dispose() => fonts.Dispose();
 }

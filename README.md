@@ -17,12 +17,13 @@ when the passage opens, it lets you know
 
 `/potdcount` still works too
 
-the big number is the rough **kills left**, with Flight split into **this floor** and **next floor**
-open **details** when you want the full floor range, the rest stays tucked away
+the big number is the rough **kills left**, with a clear **ACTIVE** or **INACTIVE** Flight badge
+blue text means Flight is ready for the next floor, amber tells you a boss is ahead
+open **run details** in `/potd` when you want the observed count and full floor range
 
 already using the Pages `/notation/repo.json` address? that row works too, you only need one
 
-the first alpha has a positive live PotD report, this update gives the counter a little more room to breathe
+the first alpha has a positive live PotD report, this update brings the approved glanceable HUD to the plugin
 the new layout is still in testing while it gets an in-game look
 
 ![the shared repository page with Notation and the counter](assets/shared-repository.jpg)

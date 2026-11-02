@@ -1,0 +1,31 @@
+namespace PotdCounter.Core;
+
+// A snapshot shared by the HUD and settings; preview data never touches the tracker.
+public readonly record struct CounterDisplay(int Floor, int Kills, KnownState Here, KnownState Next,
+    bool Open = false, bool Complete = true, bool Available = true)
+{
+    public CounterPresentation Presentation => CounterPresentation.Create(Floor, Kills, Here, Open, Complete, Available, Next);
+}
+
+public readonly record struct CounterExample(string Id, string Label, CounterDisplay State);
+
+public static class CounterExamples
+{
+    public static IReadOnlyList<CounterExample> All { get; } = Array.AsReadOnly<CounterExample>([
+        new("normal", "Flight ready for next floor", new(193, 4, KnownState.Off, KnownState.On)),
+        new("first", "first floor", new(1, 0, KnownState.Off, KnownState.Off)),
+        new("flight", "Flight active", new(193, 4, KnownState.On, KnownState.Off)),
+        new("both", "active here, next floor prepared", new(193, 4, KnownState.On, KnownState.On)),
+        new("boss-next", "boss ahead", new(189, 2, KnownState.On, KnownState.Off)),
+        new("open", "passage open", new(193, 7, KnownState.Off, KnownState.Off, Open: true)),
+        new("inactive", "Flight inactive", new(193, 4, KnownState.Off, KnownState.Off)),
+        new("partial", "partial count", new(193, 3, KnownState.Unknown, KnownState.Off, Complete: false)),
+        new("unknown", "unknown Flight", new(193, 4, KnownState.Unknown, KnownState.Unknown)),
+        new("exceeded", "range exceeded", new(193, 13, KnownState.Off, KnownState.Off)),
+        new("paused", "tracking unavailable", new(193, 0, KnownState.Off, KnownState.Off, Available: false)),
+        new("boss", "boss floor", new(190, 0, KnownState.Off, KnownState.Off)),
+        new("final-next", "final floor ahead", new(199, 4, KnownState.On, KnownState.Off)),
+        new("complete", "floor 200", new(200, 0, KnownState.Off, KnownState.Off, Open: true)),
+        new("boss-queued", "boss ahead with Flight observed", new(189, 2, KnownState.On, KnownState.On)),
+    ]);
+}

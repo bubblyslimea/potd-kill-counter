@@ -1,47 +1,85 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="430" viewBox="0 0 1080 430">
-<rect width="1080" height="430" rx="18" fill="#15151b"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="720" viewBox="0 0 1080 720">
+<rect width="1080" height="720" rx="18" fill="#16181d"/>
 <g font-family="DejaVu Sans,Arial,sans-serif">
-<text x="36" y="48" fill="#f5f2f7" font-size="25">Riri&#x27;s PotD Counter</text>
-<text x="36" y="79" fill="#fab8d1" font-size="16">a little more room to breathe</text>
-<g transform="translate(36 111)">
-<rect width="320" height="238" rx="10" fill="#1a1a21" stroke="#4d4552"/>
-<text x="16" y="30" fill="#fab8d1" font-size="14">floor 193</text>
-<text x="304" y="30" fill="#b8b5c2" font-size="14" text-anchor="end">4 kills observed</text>
-<text x="16" y="86" fill="#f5f2f7" font-size="34">~1–9</text>
-<text x="16" y="113" fill="#b8b5c2" font-size="15">estimated kills left</text>
-<path d="M16 135H304" stroke="#48404d"/>
-<text x="16" y="160" fill="#b8b5c2" font-size="13">Flight this floor</text>
-<text x="164" y="160" fill="#b8b5c2" font-size="13">Flight next floor</text>
-<text x="16" y="186" fill="#b8b5c2" font-size="16">off</text>
-<text x="164" y="186" fill="#85e6b8" font-size="16">queued</text>
-<text x="16" y="220" fill="#fab8d1" font-size="14">details</text>
+<text x="36" y="49" fill="#f7f7fc" font-size="28">Riri&#x27;s PotD Counter</text>
+<text x="36" y="80" fill="#e0b8ff" font-size="17">read the state, keep moving</text>
+<text x="36" y="114" fill="#b9bdc7" font-size="15">first floor</text>
+<g transform="translate(36 128)">
+<rect x="1" y="1" width="318" height="230" rx="18" fill="#0e1112" stroke="#424a4f" stroke-width="1"/>
+<text x="18" y="29" fill="#f7f7fc" font-size="18">floor 1</text>
+<path d="M1499 850V606Q1393 526 1303.5 491.5Q1214 457 1118 457Q1011 457 868 515Q854 521 846 524Q839 527 824 533Q669 594 575 594Q487 594 401.0 555.5Q315 517 217 434V678Q324 758 413.0 792.5Q502 827 598 827Q705 827 848 769Q863 763 870 760Q877 757 892 751Q1047 690 1141 690Q1227 690 1311.5 727.5Q1396 765 1499 850Z" fill="#f7f7fc" transform="translate(66.208 96) scale(0.033557 -0.033557)"/>
+<path d="M954 805Q1105 766 1183.5 669.5Q1262 573 1262 424Q1262 202 1092.0 86.5Q922 -29 596 -29Q481 -29 365.5 -10.5Q250 8 137 45V342Q245 288 351.5 260.5Q458 233 561 233Q714 233 795.5 286.0Q877 339 877 438Q877 540 793.5 592.5Q710 645 547 645H393V893H555Q700 893 771.0 938.5Q842 984 842 1077Q842 1163 773.0 1210.0Q704 1257 578 1257Q485 1257 390.0 1236.0Q295 1215 201 1174V1456Q315 1488 427.0 1504.0Q539 1520 647 1520Q938 1520 1082.5 1424.5Q1227 1329 1227 1137Q1227 1006 1158.0 922.5Q1089 839 954 805Z" fill="#f7f7fc" transform="translate(123.792 96) scale(0.033557 -0.033557)"/>
+<path d="M110 690H914V432H110Z" fill="#f7f7fc" transform="translate(171.611 96) scale(0.033557 -0.033557)"/>
+<path d="M137 1493H1262V1276L680 0H305L856 1210H137Z" fill="#f7f7fc" transform="translate(205.973 96) scale(0.033557 -0.033557)"/>
+<text x="160" y="126" fill="#f7f7fc" font-size="20" text-anchor="middle">kills left</text>
+<rect x="45.0" y="140" width="230" height="40" rx="20" fill="#2b3038" stroke="#f7f7fc" stroke-opacity=".35"/>
+<text x="160" y="155" fill="#f7f7fc" font-size="16" text-anchor="middle">FIRST FLOOR:</text>
+<text x="160" y="174" fill="#f7f7fc" font-size="18" text-anchor="middle">Flight Unavailable</text>
 </g>
-<g transform="translate(380 111)">
-<rect width="320" height="238" rx="10" fill="#1a1a21" stroke="#4d4552"/>
-<text x="16" y="30" fill="#fab8d1" font-size="14">floor 193</text>
-<text x="304" y="30" fill="#b8b5c2" font-size="14" text-anchor="end">7 kills observed</text>
-<text x="16" y="86" fill="#85e6b8" font-size="23">passage open</text>
-<text x="16" y="113" fill="#b8b5c2" font-size="15">ready for the next floor</text>
-<path d="M16 135H304" stroke="#48404d"/>
-<text x="16" y="160" fill="#b8b5c2" font-size="13">Flight this floor</text>
-<text x="164" y="160" fill="#b8b5c2" font-size="13">Flight next floor</text>
-<text x="16" y="186" fill="#b8b5c2" font-size="16">off</text>
-<text x="164" y="186" fill="#85e6b8" font-size="16">queued</text>
-<text x="16" y="220" fill="#fab8d1" font-size="14">details</text>
+<text x="380" y="114" fill="#b9bdc7" font-size="15">Flight active</text>
+<g transform="translate(380 128)">
+<rect x="1" y="1" width="318" height="230" rx="18" fill="#0e1112" stroke="#424a4f" stroke-width="1"/>
+<text x="18" y="29" fill="#f7f7fc" font-size="18">floor 193</text>
+<path d="M1499 850V606Q1393 526 1303.5 491.5Q1214 457 1118 457Q1011 457 868 515Q854 521 846 524Q839 527 824 533Q669 594 575 594Q487 594 401.0 555.5Q315 517 217 434V678Q324 758 413.0 792.5Q502 827 598 827Q705 827 848 769Q863 763 870 760Q877 757 892 751Q1047 690 1141 690Q1227 690 1311.5 727.5Q1396 765 1499 850Z" fill="#f7f7fc" transform="translate(66.208 96) scale(0.033557 -0.033557)"/>
+<path d="M240 266H580V1231L231 1159V1421L578 1493H944V266H1284V0H240Z" fill="#f7f7fc" transform="translate(123.792 96) scale(0.033557 -0.033557)"/>
+<path d="M110 690H914V432H110Z" fill="#f7f7fc" transform="translate(171.611 96) scale(0.033557 -0.033557)"/>
+<path d="M954 805Q1105 766 1183.5 669.5Q1262 573 1262 424Q1262 202 1092.0 86.5Q922 -29 596 -29Q481 -29 365.5 -10.5Q250 8 137 45V342Q245 288 351.5 260.5Q458 233 561 233Q714 233 795.5 286.0Q877 339 877 438Q877 540 793.5 592.5Q710 645 547 645H393V893H555Q700 893 771.0 938.5Q842 984 842 1077Q842 1163 773.0 1210.0Q704 1257 578 1257Q485 1257 390.0 1236.0Q295 1215 201 1174V1456Q315 1488 427.0 1504.0Q539 1520 647 1520Q938 1520 1082.5 1424.5Q1227 1329 1227 1137Q1227 1006 1158.0 922.5Q1089 839 954 805Z" fill="#f7f7fc" transform="translate(205.973 96) scale(0.033557 -0.033557)"/>
+<text x="160" y="126" fill="#f7f7fc" font-size="20" text-anchor="middle">kills left</text>
+<rect x="51.0" y="140" width="218" height="40" rx="20" fill="#3b2154" stroke="#e0b8ff" stroke-opacity=".35"/>
+<text x="160" y="167" fill="#e0b8ff" font-size="18" text-anchor="middle">ACTIVE  Flight</text>
 </g>
-<g transform="translate(724 111)">
-<rect width="320" height="238" rx="10" fill="#1a1a21" stroke="#4d4552"/>
-<text x="16" y="30" fill="#fab8d1" font-size="14">floor 193</text>
-<text x="304" y="30" fill="#b8b5c2" font-size="14" text-anchor="end">3 kills observed</text>
-<text x="16" y="86" fill="#ffcf75" font-size="23">kills left unknown</text>
-<text x="16" y="113" fill="#b8b5c2" font-size="15">partial count</text>
-<path d="M16 135H304" stroke="#48404d"/>
-<text x="16" y="160" fill="#b8b5c2" font-size="13">Flight this floor</text>
-<text x="164" y="160" fill="#b8b5c2" font-size="13">Flight next floor</text>
-<text x="16" y="186" fill="#ffcf75" font-size="16">unknown</text>
-<text x="164" y="186" fill="#b8b5c2" font-size="16">not queued</text>
-<text x="16" y="220" fill="#fab8d1" font-size="14">details</text>
+<text x="724" y="114" fill="#b9bdc7" font-size="15">Flight ready for next floor</text>
+<g transform="translate(724 128)">
+<rect x="1" y="1" width="318" height="230" rx="18" fill="#0e1112" stroke="#424a4f" stroke-width="1"/>
+<text x="18" y="29" fill="#f7f7fc" font-size="18">floor 193</text>
+<path d="M1499 850V606Q1393 526 1303.5 491.5Q1214 457 1118 457Q1011 457 868 515Q854 521 846 524Q839 527 824 533Q669 594 575 594Q487 594 401.0 555.5Q315 517 217 434V678Q324 758 413.0 792.5Q502 827 598 827Q705 827 848 769Q863 763 870 760Q877 757 892 751Q1047 690 1141 690Q1227 690 1311.5 727.5Q1396 765 1499 850Z" fill="#f7f7fc" transform="translate(66.208 96) scale(0.033557 -0.033557)"/>
+<path d="M240 266H580V1231L231 1159V1421L578 1493H944V266H1284V0H240Z" fill="#f7f7fc" transform="translate(123.792 96) scale(0.033557 -0.033557)"/>
+<path d="M110 690H914V432H110Z" fill="#f7f7fc" transform="translate(171.611 96) scale(0.033557 -0.033557)"/>
+<path d="M205 33V309Q297 266 381.0 244.5Q465 223 547 223Q719 223 815.0 318.5Q911 414 928 602Q860 552 783.0 527.0Q706 502 616 502Q387 502 246.5 635.5Q106 769 106 987Q106 1228 262.5 1373.0Q419 1518 682 1518Q974 1518 1134.0 1321.0Q1294 1124 1294 764Q1294 394 1107.0 182.5Q920 -29 594 -29Q489 -29 393.0 -13.5Q297 2 205 33ZM680 752Q781 752 832.0 817.5Q883 883 883 1014Q883 1144 832.0 1210.0Q781 1276 680 1276Q579 1276 528.0 1210.0Q477 1144 477 1014Q477 883 528.0 817.5Q579 752 680 752Z" fill="#f7f7fc" transform="translate(205.973 96) scale(0.033557 -0.033557)"/>
+<text x="160" y="126" fill="#f7f7fc" font-size="20" text-anchor="middle">kills left</text>
+<rect x="51.0" y="140" width="218" height="40" rx="20" fill="#2b3038" stroke="#f7f7fc" stroke-opacity=".35"/>
+<text x="160" y="167" fill="#f7f7fc" font-size="18" text-anchor="middle">INACTIVE  Flight</text>
+<text x="160" y="202" fill="#66d6ff" font-size="16" text-anchor="middle">NEXT FLOOR: Flight activated</text>
 </g>
-<text x="36" y="387" fill="#b8b5c2" font-size="13">layout preview · simulated values · not an in-game capture</text>
-<text x="36" y="410" fill="#c9a8b9" font-size="13">/potd opens settings · /potdcount still works too</text>
+<text x="36" y="394" fill="#b9bdc7" font-size="15">active here, next floor prepared</text>
+<g transform="translate(36 408)">
+<rect x="1" y="1" width="318" height="230" rx="18" fill="#0e1112" stroke="#424a4f" stroke-width="1"/>
+<text x="18" y="29" fill="#f7f7fc" font-size="18">floor 193</text>
+<path d="M1499 850V606Q1393 526 1303.5 491.5Q1214 457 1118 457Q1011 457 868 515Q854 521 846 524Q839 527 824 533Q669 594 575 594Q487 594 401.0 555.5Q315 517 217 434V678Q324 758 413.0 792.5Q502 827 598 827Q705 827 848 769Q863 763 870 760Q877 757 892 751Q1047 690 1141 690Q1227 690 1311.5 727.5Q1396 765 1499 850Z" fill="#f7f7fc" transform="translate(66.208 96) scale(0.033557 -0.033557)"/>
+<path d="M240 266H580V1231L231 1159V1421L578 1493H944V266H1284V0H240Z" fill="#f7f7fc" transform="translate(123.792 96) scale(0.033557 -0.033557)"/>
+<path d="M110 690H914V432H110Z" fill="#f7f7fc" transform="translate(171.611 96) scale(0.033557 -0.033557)"/>
+<path d="M954 805Q1105 766 1183.5 669.5Q1262 573 1262 424Q1262 202 1092.0 86.5Q922 -29 596 -29Q481 -29 365.5 -10.5Q250 8 137 45V342Q245 288 351.5 260.5Q458 233 561 233Q714 233 795.5 286.0Q877 339 877 438Q877 540 793.5 592.5Q710 645 547 645H393V893H555Q700 893 771.0 938.5Q842 984 842 1077Q842 1163 773.0 1210.0Q704 1257 578 1257Q485 1257 390.0 1236.0Q295 1215 201 1174V1456Q315 1488 427.0 1504.0Q539 1520 647 1520Q938 1520 1082.5 1424.5Q1227 1329 1227 1137Q1227 1006 1158.0 922.5Q1089 839 954 805Z" fill="#f7f7fc" transform="translate(205.973 96) scale(0.033557 -0.033557)"/>
+<text x="160" y="126" fill="#f7f7fc" font-size="20" text-anchor="middle">kills left</text>
+<rect x="51.0" y="140" width="218" height="40" rx="20" fill="#3b2154" stroke="#e0b8ff" stroke-opacity=".35"/>
+<text x="160" y="167" fill="#e0b8ff" font-size="18" text-anchor="middle">ACTIVE  Flight</text>
+<text x="160" y="202" fill="#66d6ff" font-size="16" text-anchor="middle">NEXT FLOOR: Flight activated</text>
+</g>
+<text x="380" y="394" fill="#b9bdc7" font-size="15">boss ahead</text>
+<g transform="translate(380 408)">
+<rect x="1" y="1" width="318" height="230" rx="18" fill="#0e1112" stroke="#424a4f" stroke-width="1"/>
+<text x="18" y="29" fill="#f7f7fc" font-size="18">floor 189</text>
+<path d="M1499 850V606Q1393 526 1303.5 491.5Q1214 457 1118 457Q1011 457 868 515Q854 521 846 524Q839 527 824 533Q669 594 575 594Q487 594 401.0 555.5Q315 517 217 434V678Q324 758 413.0 792.5Q502 827 598 827Q705 827 848 769Q863 763 870 760Q877 757 892 751Q1047 690 1141 690Q1227 690 1311.5 727.5Q1396 765 1499 850Z" fill="#f7f7fc" transform="translate(66.208 96) scale(0.033557 -0.033557)"/>
+<path d="M240 266H580V1231L231 1159V1421L578 1493H944V266H1284V0H240Z" fill="#f7f7fc" transform="translate(123.792 96) scale(0.033557 -0.033557)"/>
+<path d="M110 690H914V432H110Z" fill="#f7f7fc" transform="translate(171.611 96) scale(0.033557 -0.033557)"/>
+<path d="M954 805Q1105 766 1183.5 669.5Q1262 573 1262 424Q1262 202 1092.0 86.5Q922 -29 596 -29Q481 -29 365.5 -10.5Q250 8 137 45V342Q245 288 351.5 260.5Q458 233 561 233Q714 233 795.5 286.0Q877 339 877 438Q877 540 793.5 592.5Q710 645 547 645H393V893H555Q700 893 771.0 938.5Q842 984 842 1077Q842 1163 773.0 1210.0Q704 1257 578 1257Q485 1257 390.0 1236.0Q295 1215 201 1174V1456Q315 1488 427.0 1504.0Q539 1520 647 1520Q938 1520 1082.5 1424.5Q1227 1329 1227 1137Q1227 1006 1158.0 922.5Q1089 839 954 805Z" fill="#f7f7fc" transform="translate(205.973 96) scale(0.033557 -0.033557)"/>
+<text x="160" y="126" fill="#f7f7fc" font-size="20" text-anchor="middle">kills left</text>
+<rect x="51.0" y="140" width="218" height="40" rx="20" fill="#3b2154" stroke="#e0b8ff" stroke-opacity=".35"/>
+<text x="160" y="167" fill="#e0b8ff" font-size="18" text-anchor="middle">ACTIVE  Flight</text>
+<text x="160" y="202" fill="#ffcf4a" font-size="16" text-anchor="middle">BOSS NEXT FLOOR</text>
+</g>
+<text x="724" y="394" fill="#b9bdc7" font-size="15">passage open</text>
+<g transform="translate(724 408)">
+<rect x="1" y="1" width="318" height="230" rx="18" fill="#0e1112" stroke="#66fab0" stroke-width="2"/>
+<text x="18" y="29" fill="#f7f7fc" font-size="18">floor 193</text>
+<path d="M870 1241Q694 1241 597.0 1111.0Q500 981 500 745Q500 510 597.0 380.0Q694 250 870 250Q1047 250 1144.0 380.0Q1241 510 1241 745Q1241 981 1144.0 1111.0Q1047 1241 870 1241ZM870 1520Q1230 1520 1434.0 1314.0Q1638 1108 1638 745Q1638 383 1434.0 177.0Q1230 -29 870 -29Q511 -29 306.5 177.0Q102 383 102 745Q102 1108 306.5 1314.0Q511 1520 870 1520Z" fill="#66fab0" transform="translate(32.372 96) scale(0.033557 -0.033557)"/>
+<path d="M188 1493H827Q1112 1493 1264.5 1366.5Q1417 1240 1417 1006Q1417 771 1264.5 644.5Q1112 518 827 518H573V0H188ZM573 1214V797H786Q898 797 959.0 851.5Q1020 906 1020 1006Q1020 1106 959.0 1160.0Q898 1214 786 1214Z" fill="#66fab0" transform="translate(90.795 96) scale(0.033557 -0.033557)"/>
+<path d="M188 1493H1227V1202H573V924H1188V633H573V291H1249V0H188Z" fill="#66fab0" transform="translate(141.164 96) scale(0.033557 -0.033557)"/>
+<path d="M188 1493H618L1161 469V1493H1526V0H1096L553 1024V0H188Z" fill="#66fab0" transform="translate(188.111 96) scale(0.033557 -0.033557)"/>
+<path d="M258.628 70l9 9l20 -23" stroke="#66fab0" stroke-width="5" fill="none"/>
+<text x="160" y="126" fill="#f7f7fc" font-size="20" text-anchor="middle">passage</text>
+<rect x="51.0" y="140" width="218" height="40" rx="20" fill="#2b3038" stroke="#f7f7fc" stroke-opacity=".35"/>
+<text x="160" y="167" fill="#f7f7fc" font-size="18" text-anchor="middle">INACTIVE  Flight</text>
+</g>
+<text x="36" y="681" fill="#b9bdc7" font-size="13">layout study · simulated values · not an in-game capture</text>
+<text x="36" y="704" fill="#e0b8ff" font-size="13">/potd opens settings · /potd preview tries these states in the native HUD</text>
 </g></svg>

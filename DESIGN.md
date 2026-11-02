@@ -1,33 +1,35 @@
 # Riri's PotD Counter · Asura design
 
-## 0.1.1 display brief
+## 0.1.2 approved HUD brief
 
-help a runner read the next useful answer in one glance, with `/potd` as the short way back to settings
+help a runner read the counter during combat with the hierarchy approved in the Watch-inspired design study
+one large answer, a current Flight badge, then a separate upcoming-floor notice
 
-the first live user report says the counter works well, but the display feels crowded
-this revision changes the presentation and commands while keeping counting, floor rules, Flight timing and polling intact
+- keep a fixed 320 × 232 logical-pixel card, scaled with Dalamud, with a quiet floor label and a crisp, centred headline
+- use `~1–9` and `kills left` for estimates, `OPEN` and a checkmark only for a confirmed open passage
+- show `?` with a short reason for partial, unknown or unavailable observations, and `CHECK` when the range is exceeded
+- keep `ACTIVE Flight` lavender, `INACTIVE Flight` neutral and `UNKNOWN Flight` amber in the same badge position
+- on actual floor 1 with known inactive Flight, show the requested two-line `FIRST FLOOR:` / `Flight Unavailable` badge
+this describes the incoming effect, not pomander inventory, and does not apply to floors 11, 51 or 191
+unknown remains unknown even on floor 1
+- show `NEXT FLOOR: Flight activated` in blue for an observed queue and `NEXT FLOOR: Flight unknown` in amber when unsettled
+reserve a second upcoming line for `BOSS NEXT FLOOR` so a boss notice cannot erase a Flight observation
+floor 199 says `FINAL FLOOR NEXT`, floor 200 has no Flight display or fictional next floor
+- keep observed kills, full ranges and explanations in `/potd` settings, including while the overlay is locked
+- the card has no controls, columns, dividers, progress rings or animation
+keep its current window identity, placement, opacity and click-through preference
+- label native previews as simulations above the card, real runs always take priority
+provide the approved states as preview presets as well as manual simulation controls
 
-- one prominent answer: the estimated kills left, or the actual passage state
-- floor and observed kills form a quiet context row
-- Flight has two aligned columns explicitly labelled **this floor** and **next floor**, each with a written state
-- total ranges and explanations live behind **details**, closed by default
-uncertainty stays visible in the main card even when details are closed
-- green means the passage is open or Flight is confirmed, amber marks uncertainty, pink is a small Riri accent
-text carries every meaning too
-- `/potd` and `/potdcount` share the settings, preview and toggle commands
-only successfully registered commands are removed on disposal
-- keep existing position, opacity, lock and range preferences, with a new independent detail preference
+keep the existing C# / Dalamud / ImGui stack and all counting, floor, Flight transition and polling mechanics
+pure presentation code selects truthful content, native drawing owns fonts and placement, settings own details
+use the managed atlas at actual rendering sizes, with no window-font enlargement
+an embedded, renamed Latin headline subset of DejaVu Sans Bold supplies the heavy digits without OS font assumptions or network requests
+the font notice ships with the existing acknowledgements, other text uses Dalamud's own font assets
 
-the design takes its cues from Google's [simpler Maps home screen](https://blog.google/products-and-platforms/products/maps/google-maps-updates-summer-travel-2024/) and its [work on color and hierarchy](https://design.google/library/exploring-color-google-maps)
-the application here is our design choice: one main answer above optional supporting detail, using the existing native overlay
-
-use the current C# / Dalamud / ImGui stack with no new runtime dependencies
-the estimator supplies facts to a small pure presentation model, which selects the main answer, caveat and supporting text
-the window places those fields, settings control visibility, and both commands enter the same handler
-
-implementation order: add the command alias, verify the presentation states, connect the compact window, then refresh the labelled previews and publish a new testing version
-verify all existing core checks plus open-state priority, partial and unavailable counts, unknown Flight and boss/completion presentation
-compile against the actual host, inspect the layout study, and record that the new native appearance still needs in-game review
+implementation sequence: verify presentation states and boundary floors, add managed fonts and fixed native drawing, move details to settings, then refresh the labelled previews and publish a new testing version
+verify all existing mechanics plus all current/next Flight combinations, first-floor truth, boss and completion boundaries, confirmed-passage priority and text fitting
+compile against actual Dalamud references, inspect the generated layout study, and keep native appearance and scaling marked for in-game review
 
 ## build brief
 

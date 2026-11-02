@@ -2,7 +2,7 @@
 
 ## this build
 
-0.1.1.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
+0.1.2.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
 the release ZIP contains one plugin assembly, its manifest and dependency description, plus the license and acknowledgements
 Dalamud supplies the host assemblies, they are not included in the download
 
@@ -80,16 +80,34 @@ starting a preview also makes a hidden overlay visible
 
 drag the background while unlocked, right-click it to open settings
 locking also enables click-through, `/potd` lets you unlock it again
-**details** expands the floor total and explanation, **keep details open** in settings also works while the overlay is locked
+**run details** in settings holds observed kills, the floor total and explanations, and works while the overlay is locked
 the short command is registered only if available, a conflicting plugin command is left intact
 Dalamud remembers the placement and the plugin saves display preferences
 preview values never affect the live tracker
 
-the compact card leads with the estimated kills left, then separates Flight this floor from Flight next floor
-partial counts and unknown Flight remain visible even with details closed, completion hides next-floor information
-settings put explanations and reader status behind separate expanders
+the fixed-size card leads with the estimated kills left, then a current Flight badge and an independent next-floor notice
+lavender means active here, blue means activated for the next floor, neutral means inactive, and amber marks unknown states or the next boss
+text carries the meaning as well as color
+`OPEN` with a checkmark replaces the estimate only when the client confirms passage activation
 
-`PREVIEW.html` is an interactive layout study with example data exported by the real C# presentation model
+`FIRST FLOOR:` / `Flight Unavailable` appears only on actual floor 1 with known inactive incoming Flight
+it is not an inventory check, a use on floor 1 can still prepare floor 2
+floors 11, 51 and 191 are not treated as floor 1, unknown remains unknown
+a boss notice has a separate reserved line so it cannot hide an observed Flight queue
+floor 199 points to the final floor, floor 200 shows `CLEAR` without another Flight destination
+
+partial counts and unknown Flight show `?` with a visible reason
+passing the estimated maximum shows `CHECK`, never a fabricated open passage
+settings put detailed counts, explanations and reader status behind separate expanders
+
+the managed font atlas bakes the headline at its actual size and rebuilds for Dalamud UI scaling
+the small embedded headline font is a renamed subset of DejaVu Sans Bold, supporting text uses the host's font assets
+there is no window-font enlargement, new runtime dependency or network request
+font handles are created once and disposed on unload
+the 320 × 232 logical-pixel card keeps the same layout across states, with an extra simulation banner above previews
+saved placement, lock and opacity are retained, new installations default to 96% opacity
+
+`PREVIEW.html` is an interactive layout study with the same 15 examples used by the native preview controls
 the README visual is also a labelled layout preview, neither is an in-game capture
 the native simulation command lets you inspect the actual overlay without entering PotD
 

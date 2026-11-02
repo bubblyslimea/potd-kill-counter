@@ -1,21 +1,24 @@
-# a little more room to breathe
+# read the state, keep moving
 
-/potd works now too !!
+the new HUD is here !!
 
-open `/potd` for settings, `/potd preview` for a simulation or `/potd toggle` to show and hide the counter
-`/potdcount` still accepts the same commands
+big, crisp kills left, a clear Flight badge, and a separate reminder for the next floor
+lavender means active here, blue means Flight was activated for the next floor, amber calls out a boss ahead
+floor 1 gets the requested **FIRST FLOOR: Flight Unavailable** badge
 
-the rough kills left is the main thing you see now
-Flight this floor and Flight next floor have their own little columns, with full ranges and explanations tucked into **details**
-when the passage opens, that becomes the main message
+when the game confirms the passage is open, **OPEN** takes the main spot
+uncertain counts keep their question mark and a short reason
+observed kills, full ranges and explanations are in **run details** inside `/potd`
 
-counting and Flight timing keep the same behavior, and unknown counts stay clearly labelled
-there are no new runtime dependencies or network requests
+open `/potd preview` to try the new card, then `/potd` to choose from 15 examples
+`/potdcount` still works, and your placement, opacity and click-through settings are kept
+counting and Flight timing are unchanged
 
-update the plugin in `/xlplugins`, using your existing [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json) with testing builds enabled
-both the `/plugins/repo.json` and `/notation/repo.json` addresses serve this update, keep only one row
+update in `/xlplugins` using your existing [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json) with testing builds enabled
+both the `/plugins/repo.json` and `/notation/repo.json` addresses work, keep only one row
 
 the first alpha has a positive live PotD report
-this redesign passed 2,216 offline assertions and a build against the actual Dalamud host, its native appearance still needs an in-game look
+this update passed 2,287 offline assertions and compilation against the actual Dalamud host
+the layout study is labelled simulated, the new native rendering still needs its in-game look
 
 [installation and testing notes](https://github.com/bubblyslimea/potd-kill-counter/blob/main/TECHNICAL_DETAILS.md)
