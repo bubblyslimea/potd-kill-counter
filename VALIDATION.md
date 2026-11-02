@@ -15,10 +15,16 @@
 | preferences | existing position, opacity, lock and range settings retained, details default closed |
 | presentation | nine states exported by the real C# presentation model, labelled vector preview visually reviewed |
 | packaging | five reviewed runtime/license files, no host assemblies or debug files |
-| Windows release | the publication workflow repeats checks and packaging before creating the release |
+| Windows release | GitHub Actions passed all checks and published the testing release |
 
 the [release](https://github.com/bubblyslimea/potd-kill-counter/releases/tag/v0.1.1-alpha.1) includes a checksum file and a record of individual runtime file hashes
 the local review build and Windows release are separate builds, use the release's record when checking the download
+
+published Windows ZIP: 21,075 bytes
+
+`7fa3c44fe86c0af10a2eee9b84f48b468179ef40c9a9d184c19a29c216db639d`
+
+[successful Windows build](https://github.com/bubblyslimea/potd-kill-counter/actions/runs/41424964927)
 
 ## live evidence and remaining review
 
