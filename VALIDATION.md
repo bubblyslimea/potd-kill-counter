@@ -16,9 +16,19 @@
 | fonts | managed atlas sizes, embedded headline subset, scoped pushes and disposal on unload |
 | presentation | 15 shared native/model examples, headline bounds checked, six-state vector study visually reviewed |
 | packaging | five runtime/license files, embedded font notice, no host assemblies, debug files or private build paths |
+| Windows release | all checks passed, immutable testing release published |
 
 the [release](https://github.com/bubblyslimea/potd-kill-counter/releases/tag/v0.1.2-alpha.1) includes a checksum file and individual runtime file hashes
 the local review build and Windows release are separate builds, use the release record when checking the download
+
+published Windows ZIP: 37,341 bytes
+
+`d1c7464554806ed4b4cd4a5c52a7af40d4e6700662a1bd283e6be582773f8886`
+
+[successful Windows build](https://github.com/bubblyslimea/potd-kill-counter/actions/runs/41435949300)
+
+the published repository JSON matches the generated Windows line-ending variant by SHA-256
+the standalone HTML script passes a syntax check, browser automation was unavailable in this environment
 
 ## live evidence and remaining review
 

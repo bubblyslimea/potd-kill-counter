@@ -39,7 +39,7 @@ function show(s){
  const v=s.view,b=v.Flight;
  $('floor').textContent='floor '+s.floor;
  $('headline').textContent=v.Main;$('headline').style.color=colors[v.Tone];
- $('check').hidden=v.Main!=='OPEN';$('hud').classList.toggle('ready',v.Tone===1);
+ $('check').toggleAttribute('hidden',v.Main!=='OPEN');$('hud').classList.toggle('ready',v.Tone===1);
  $('caption').textContent=v.Caption;$('caption').style.fontSize=v.Caption.length>22?'16px':'20px';
  $('badge').hidden=!v.ShowFlight;$('badge').classList.toggle('first',b.TwoLines);
  $('badge').style.color=colors[b.Tone];$('badge').style.background=fills[b.Tone]||fills[0];
