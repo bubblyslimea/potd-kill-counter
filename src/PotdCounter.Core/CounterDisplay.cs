@@ -14,6 +14,8 @@ public static class CounterExamples
     public static IReadOnlyList<CounterExample> All { get; } = Array.AsReadOnly<CounterExample>([
         new("normal", "Flight ready for next floor", new(193, 4, KnownState.Off, KnownState.On)),
         new("first", "first floor", new(1, 0, KnownState.Off, KnownState.Off)),
+        new("first-partial", "first floor, joined late", new(1, 0, KnownState.Off, KnownState.Off, Complete: false)),
+        new("set-start", "later starting floor", new(161, 0, KnownState.Unknown, KnownState.Off)),
         new("flight", "Flight active", new(193, 4, KnownState.On, KnownState.Off)),
         new("both", "active here, next floor prepared", new(193, 4, KnownState.On, KnownState.On)),
         new("boss-next", "boss ahead", new(189, 2, KnownState.On, KnownState.Off)),

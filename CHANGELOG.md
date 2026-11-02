@@ -1,5 +1,16 @@
 # little changes
 
+## 0.1.3.0 · a count from the first floor
+
+- kills left stay visible when incoming Flight is unavailable or unconfirmed
+- floor 1 keeps its estimate above **FIRST FLOOR: Flight Unavailable**, including after a late attachment
+- incomplete counts use a wider range with **kills left · partial**
+- later starting floors cover both possible Flight targets until the effect is known
+- confirmed passage activation still wins, unavailable tracking still pauses estimates
+- preview includes fresh floor 1, late floor 1 and a later set start
+
+the HUD layout, counting hooks and Flight carry timing are unchanged
+
 ## 0.1.2.0 · read the state, keep moving
 
 - the approved Watch-inspired HUD replaces the two-column layout

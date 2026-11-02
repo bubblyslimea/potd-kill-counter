@@ -42,7 +42,7 @@ p{color:#b9bdc7;line-height:1.6;font-size:14px}.stage{display:grid;place-items:c
 details{margin-top:24px}summary{cursor:pointer;color:#e0b8ff}.foot{font-size:12px}[hidden]{display:none!important}
 @media(max-width:360px){body{padding:24px 8px}.stage{margin-left:-8px;margin-right:-8px}}
 </style>
-<main><div class="eyebrow">Riri's PotD Counter · 0.1.2</div><h1>read the state, keep moving</h1>
+<main><div class="eyebrow">Riri's PotD Counter · 0.1.3</div><h1>read the state, keep moving</h1>
 <p>the count up front, Flight where you expect it, details in /potd when you need them</p>
 <p class="foot">layout study · simulated values · not an in-game capture</p>
 <section class="stage" aria-label="Simulated HUD"><div class="hud" id="hud">

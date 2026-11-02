@@ -1,5 +1,20 @@
 # Riri's PotD Counter · Asura design
 
+## 0.1.3 starting-floor correction
+
+keep the kills-left estimate visible even when no incoming Flight applies or its state is unknown
+the prior presentation could replace the entire estimate with a question mark on live starting floors
+
+keep the existing native layout and counting hooks
+the tracker can establish that actual floor 1 has no previous-floor Flight without assuming every kill was observed
+the estimator returns a wider range when confidence is incomplete
+unknown Flight spans both possible targets, partial counts start at one and subtract only observed kills from the maximum
+the HUD keeps its approximation marker, amber tint and partial-count caption or unknown Flight badge
+unavailable tracking still pauses estimates, confirmed passage activation still wins, and a passed maximum never becomes a false open signal
+
+sequence: reproduce fresh and late-attached floor 1 plus a later starting floor, fix the pure estimate and presentation, then verify the same paths through the tracker
+check conservative bounds against possible missing kills and both Flight outcomes, compile, and publish a small testing update through the existing catalog
+
 ## 0.1.2 approved HUD brief
 
 help a runner read the counter during combat with the hierarchy approved in the Watch-inspired design study
@@ -7,11 +22,11 @@ one large answer, a current Flight badge, then a separate upcoming-floor notice
 
 - keep a fixed 320 × 232 logical-pixel card, scaled with Dalamud, with a quiet floor label and a crisp, centred headline
 - use `~1–9` and `kills left` for estimates, `OPEN` and a checkmark only for a confirmed open passage
-- show `?` with a short reason for partial, unknown or unavailable observations, and `CHECK` when the range is exceeded
+- show wider, qualified estimates for partial counts or unknown Flight, `?` for unavailable tracking, and `CHECK` when the range is exceeded
 - keep `ACTIVE Flight` lavender, `INACTIVE Flight` neutral and `UNKNOWN Flight` amber in the same badge position
 - on actual floor 1 with known inactive Flight, show the requested two-line `FIRST FLOOR:` / `Flight Unavailable` badge
 this describes the incoming effect, not pomander inventory, and does not apply to floors 11, 51 or 191
-unknown remains unknown even on floor 1
+the tracker knows actual floor 1 cannot inherit a previous-floor effect, even when its kill count is partial
 - show `NEXT FLOOR: Flight activated` in blue for an observed queue and `NEXT FLOOR: Flight unknown` in amber when unsettled
 reserve a second upcoming line for `BOSS NEXT FLOOR` so a boss notice cannot erase a Flight observation
 floor 199 says `FINAL FLOOR NEXT`, floor 200 has no Flight display or fictional next floor
@@ -58,7 +73,7 @@ unknown Flight is not equivalent to no Flight
 floor 200 is the completion floor, not another boss
 - A clear-all can open the passage before the published minimum; the actual open state always wins
 - party kills outside the receiving client's view can be missed
-mark party counts as partial and suppress numerical remaining estimates rather than misrepresenting them as a complete party total
+mark party counts as partial and show a conservative remaining range, never a complete party total
 - disable the optional native death observer cleanly if its supported address cannot be resolved; do not substitute a misleading working counter
 - moveable, compact overlay; saved display preferences; slash command for settings and a simulation preview
 - no backend, telemetry, texture downloads, combat control, full object-table polling, per-kill disk writes, or run-history database
@@ -91,7 +106,7 @@ if the old flag persists, first observe it clearing; a subsequent queue belongs 
 the game's callback always runs exactly once and its arguments are unchanged
 5. on framework updates, observations matching the current floor/session are consumed
 unknown actor identities lower confidence; known non-enemies do not count
-6. the pure estimator returns an estimated remaining range only for a known Flight state and a sufficiently observed floor
+6. the pure estimator returns an estimated remaining range, widening it for unknown Flight or missing earlier kills
 while passage is closed its lower bound cannot be zero
 passing the published maximum produces an uncertainty message, never a false open signal
 7. the overlay renders the snapshot

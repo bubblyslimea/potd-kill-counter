@@ -37,7 +37,8 @@ public sealed class FloorTracker
         {
             var consecutive = HasFloor && InstanceKey == snapshot.InstanceKey && snapshot.Floor == Floor + 1;
             var inheritedFlight = consecutive ? FlightNext : KnownState.Unknown;
-            FlightHere = snapshot.Floor == 1 && observedEntrance ? KnownState.Off : inheritedFlight;
+            // Floor 1 cannot inherit Flight, even if we missed the entrance or earlier kills.
+            FlightHere = snapshot.Floor == 1 ? KnownState.Off : inheritedFlight;
             CountComplete = consecutive || observedEntrance;
             ConfidenceNote = CountComplete ? "counting since you entered this floor" : "joined mid-floor, earlier kills may be missing";
             InstanceKey = snapshot.InstanceKey;

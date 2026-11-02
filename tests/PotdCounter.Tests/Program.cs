@@ -51,7 +51,7 @@ Check(!t.Observe(new(1, 191, 124, false)), "non-enemy excluded");
 Check(!t.Observe(new(2, 191, 124, true)), "different instance excluded");
 Check(!t.Observe(new(1, 190, 124, true)), "stale floor excluded");
 Check(!t.Observe(new(1, 191, 0xE0000000, true)), "sentinel actor excluded");
-Check(PassageEstimator.Estimate(t).Kind == EstimateKind.Partial, "partial count suppresses remainder");
+Check(PassageEstimator.Estimate(t).Kind == EstimateKind.Partial, "partial count retains its uncertainty state");
 t.Apply(S(191, KnownState.Off), 900);
 Check(t.FlightNext == KnownState.On, "queued Flight survives flag clearing before floor number changes");
 
@@ -117,7 +117,7 @@ Check(PassageEstimator.Estimate(193, 13, KnownState.Off, false, true).Kind == Es
 Check(PassageEstimator.Estimate(193, 100, KnownState.Unknown, true, false).Kind == EstimateKind.Open,
     "game open overrides uncertain count and Flight");
 Check(PassageEstimator.Estimate(193, 4, KnownState.Unknown, false, true).Kind == EstimateKind.UnknownFlight,
-    "unknown Flight suppresses remaining estimate");
+    "unknown Flight retains its uncertainty state");
 Check(PassageEstimator.Estimate(190, 0, KnownState.On, false, true).Kind == EstimateKind.Boss,
     "boss has no normal quota");
 Check(PassageEstimator.Estimate(200, 0, KnownState.On, true, true).Kind == EstimateKind.Complete,
@@ -132,10 +132,11 @@ Check(view.Observed == "4 kills observed" && view.Range!.Contains("5–13"),
 view = CounterPresentation.Create(193, 4, KnownState.On, false, true);
 Check(view.Main == "~1–3" && view.Range!.Contains("3–7"), "active Flight adjusts displayed ranges");
 view = CounterPresentation.Create(193, 3, KnownState.Unknown, false, false);
-Check(!view.IsEstimate && view.Caption == "partial count" && view.Tone == CounterTone.Attention,
+Check(view.IsEstimate && view.Main == "~1–10" && view.Caption == "kills left · partial" && view.Tone == CounterTone.Attention,
     "partial counts remain visibly qualified with details closed");
 view = CounterPresentation.Create(193, 4, KnownState.Unknown, false, true);
-Check(!view.IsEstimate && view.Caption == "Flight not confirmed", "unknown Flight is not displayed as off");
+Check(view.IsEstimate && view.Main == "~1–9" && view.Flight.Status == "UNKNOWN" && view.Tone == CounterTone.Attention,
+    "unknown Flight widens the estimate without claiming inactive");
 Check(CounterPresentation.FlightLabel(KnownState.On) == "active" &&
       CounterPresentation.FlightLabel(KnownState.On, true) == "queued" &&
       CounterPresentation.FlightLabel(KnownState.Unknown, true) == "unknown",
@@ -206,8 +207,8 @@ foreach (var next in nextStates)
         "current and next Flight retain independent text and colors");
 }
 view = CounterPresentation.Create(1, 0, KnownState.Unknown, false, false);
-Check(view.Flight.Status == "UNKNOWN" && !view.Flight.TwoLines && view.Main == "?",
-    "late attachment on floor 1 never manufactures certainty");
+Check(view.Flight.Status == "UNKNOWN" && !view.Flight.TwoLines && view.Main == "~1–7",
+    "unknown preview input keeps an explicit badge and conservative range");
 view = CounterPresentation.Create(200, 0, KnownState.On, true, true, next: KnownState.On);
 Check(view.Main == "CLEAR" && view.NextFlightNotice is null, "completion has no queued Flight destination");
 view = CounterPresentation.Create(1, 0, KnownState.Off, false, true, next: KnownState.On);
@@ -224,6 +225,52 @@ foreach (var example in CounterExamples.All)
     Check(view.Caption.Length <= 24, "visible caveat fits the caption band");
     Check(!view.IsEstimate || view.Main.StartsWith('~'), "numeric estimates always approximate");
 }
+
+// Reproduce the live starting-floor paths through the actual tracker and view.
+var opening = new FloorTracker();
+opening.Apply(S(1), 0, observedEntrance: true);
+view = CounterPresentation.Create(opening.Floor, opening.Kills, opening.FlightHere, opening.PassageOpen, opening.CountComplete);
+Check(view.Main == "~3–7" && view.Caption == "kills left" && view.Flight.TwoLines,
+    "fresh floor 1 keeps its kills left above the unavailable Flight badge");
+Kill(opening, 70);
+Check(PassageEstimator.Estimate(opening).Remaining == new KillRange(2, 6), "first-floor estimate decreases after a kill");
+opening.Leave();
+opening.Apply(S(1), 500); // Entrance missed or plugin reloaded mid-floor.
+Check(opening.FlightHere == KnownState.Off && !opening.CountComplete,
+    "floor 1 cannot inherit Flight, but missed kills remain unknown");
+view = CounterPresentation.Create(opening.Floor, opening.Kills, opening.FlightHere, opening.PassageOpen, opening.CountComplete);
+Check(view.Main == "~1–7" && view.Caption == "kills left · partial" && view.Flight.TwoLines,
+    "late first-floor attachment still has a qualified numeric estimate");
+opening.Leave();
+opening.Apply(S(161), 1000, observedEntrance: true);
+view = CounterPresentation.Create(opening.Floor, opening.Kills, opening.FlightHere, opening.PassageOpen, opening.CountComplete);
+Check(view.Main == "~2–10" && view.Flight.Status == "UNKNOWN" && !view.Flight.TwoLines,
+    "later set start covers either incoming Flight outcome without being called floor 1");
+
+// A conservative range must contain every compatible hidden quota / missing-kill outcome.
+foreach (var floor in new[] { 1, 191 })
+foreach (var flight in Enum.GetValues<KnownState>())
+foreach (var full in new[] { false, true })
+{
+    const int observed = 1;
+    var estimate = PassageEstimator.Estimate(floor, observed, flight, false, full);
+    var possibleFlight = flight == KnownState.Unknown ? new[] { KnownState.Off, KnownState.On } : [flight];
+    var outcomes = new List<int>();
+    foreach (var actualFlight in possibleFlight)
+    {
+        var target = FloorRules.NormalRange(floor)!.Value;
+        if (actualFlight == KnownState.On) target = target.WithFlight();
+        for (var quota = target.Min; quota <= target.Max; quota++)
+        for (var actualKills = observed; actualKills <= (full ? observed : quota - 1); actualKills++)
+            if (actualKills < quota) outcomes.Add(quota - actualKills);
+    }
+    Check(estimate.Remaining is { Min: >= 1 } bounds && outcomes.All(n => n >= bounds.Min && n <= bounds.Max),
+        "remaining estimate includes all compatible hidden outcomes");
+}
+Check(PassageEstimator.Estimate(193, 13, KnownState.Unknown, false, false).Kind == EstimateKind.RangeExceeded,
+    "partial and unknown states cannot invent a numeric remainder beyond the maximum");
+Check(PassageEstimator.Estimate(1, -1, KnownState.Off, false, true).Remaining == new KillRange(1, 7),
+    "invalid negative counts are treated as partial without inflating the maximum");
 
 Console.WriteLine($"PASS: {checks} assertions; all 200 floors, Flight, deaths, transitions, uncertainty, passage priority and presentation.");
 

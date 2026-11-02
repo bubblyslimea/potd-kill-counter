@@ -2,7 +2,7 @@
 
 ## this build
 
-0.1.2.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
+0.1.3.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
 the release ZIP contains one plugin assembly, its manifest and dependency description, plus the license and acknowledgements
 Dalamud supplies the host assemblies, they are not included in the download
 
@@ -46,7 +46,8 @@ a witnessed consecutive floor change carries that queue into **Flight here**
 the next queue gets 750 ms to settle, a persisting old flag must clear before a fresh use is accepted
 the first alpha has a positive general live report, specific transition edge cases still need their own in-game checks
 
-loading mid-floor leaves current Flight unknown
+loading mid-floor leaves current Flight unknown above floor 1
+actual floor 1 has no previous floor to inherit Flight from, so it is known inactive even after a reload
 even a fresh set above floor 1 may inherit a Flight from the previous set, this version does not persist that history across separate instances
 unknown becomes known after a sufficiently observed consecutive floor transition
 
@@ -63,7 +64,10 @@ that value is not interpreted as a kill count or a percentage
 the game's actual open state takes priority, including a full clear that opens early
 
 loading late, reconnecting, skipped floors, a changed director, an unidentified death or unavailable reads can leave a partial count
-distant party kills may never reach your client, party counts are therefore marked partial and the numeric remainder is suppressed
+distant party kills may never reach your client, so party counts remain marked partial
+partial counts use one as the lower estimate, with the published maximum reduced only by observed kills
+unknown incoming Flight spans both normal and Flight targets, keeping a rough range visible on later starting floors
+these are conservative estimates, never a claim to know the hidden quota or the missing kill count
 the floor's target ranges and actual passage state remain available
 boss floors 10–190 have no normal quota, floor 200 is completion
 
@@ -96,7 +100,8 @@ floors 11, 51 and 191 are not treated as floor 1, unknown remains unknown
 a boss notice has a separate reserved line so it cannot hide an observed Flight queue
 floor 199 points to the final floor, floor 200 shows `CLEAR` without another Flight destination
 
-partial counts and unknown Flight show `?` with a visible reason
+partial counts keep an amber range with `kills left · partial`, unknown Flight keeps its amber badge and a wider range
+unavailable kill tracking still shows `?` with a visible reason
 passing the estimated maximum shows `CHECK`, never a fabricated open passage
 settings put detailed counts, explanations and reader status behind separate expanders
 
@@ -107,7 +112,7 @@ font handles are created once and disposed on unload
 the 320 × 232 logical-pixel card keeps the same layout across states, with an extra simulation banner above previews
 saved placement, lock and opacity are retained, new installations default to 96% opacity
 
-`PREVIEW.html` is an interactive layout study with the same 15 examples used by the native preview controls
+`PREVIEW.html` is an interactive layout study with the same 17 examples used by the native preview controls
 the README visual is also a labelled layout preview, neither is an in-game capture
 the native simulation command lets you inspect the actual overlay without entering PotD
 

@@ -9,6 +9,9 @@ a little counter for the climb
 keeps track of the kills you see, your Flight pomanders, and roughly how much might be left
 when the passage opens, it lets you know
 
+no Flight required, the first floor still gets a kills-left estimate
+if earlier kills or Flight are uncertain, the range gets wider and stays labelled
+
 ## come try it
 
 1. add the [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json) in `/xlsettings` → **Experimental → Custom Plugin Repositories** and save

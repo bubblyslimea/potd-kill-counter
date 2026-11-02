@@ -57,7 +57,7 @@ def package():
     entry.update({"AssemblyVersion": "0.0.0.0", "TestingAssemblyVersion": version,
                   "TestingDalamudApiLevel": 15, "IsTestingExclusive": True, "IsHide": False,
                   "AcceptsFeedback": False, "DownloadLinkInstall": link, "DownloadLinkUpdate": link,
-                  "DownloadLinkTesting": link, "TestingChangelog": "read the state, keep moving\n\nbig, crisp kills left and explicit Flight badges\nnext-floor Flight and boss notices stay separate\nfloor 1 gets FIRST FLOOR: Flight Unavailable\n/potd holds the details, /potd preview lets you try it\nthe new native appearance is ready for an in-game look"})
+                  "DownloadLinkTesting": link, "TestingChangelog": "a count from the first floor\n\nno Flight required, kills left stay visible\nfloor 1 keeps its Flight Unavailable badge under the estimate\nuncertain starts use a wider range, partial counts stay labelled\n/potd preview includes fresh, late and later-set starts"})
     (OUT / "repo.json").write_text(json.dumps([entry], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     record = {"version": version, "tag": release["tag"], "channel": release["channel"],
               "archiveSha256": digest, "files": {name: sha(data) for name, data in sorted(files.items())}}

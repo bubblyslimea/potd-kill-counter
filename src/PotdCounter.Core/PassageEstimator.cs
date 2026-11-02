@@ -13,8 +13,8 @@ public readonly record struct PassageEstimate(
         EstimateKind.Boss => "boss floor",
         EstimateKind.Complete => "floor 200 · you made it !!",
         EstimateKind.Normal => $"~{Remaining} more kills",
-        EstimateKind.Partial => "remaining unknown · partial count",
-        EstimateKind.UnknownFlight => "remaining unknown · Flight unconfirmed",
+        EstimateKind.Partial => $"~{Remaining} more kills · partial count",
+        EstimateKind.UnknownFlight => $"~{Remaining} more kills · Flight unconfirmed",
         EstimateKind.RangeExceeded => "past the usual range · check passage",
         _ => "waiting for data",
     };
@@ -37,13 +37,23 @@ public static class PassageEstimator
 
         var normal = FloorRules.NormalRange(floor)!.Value;
         var withFlight = normal.WithFlight();
-        if (!countComplete || kills < 0) return new(EstimateKind.Partial, normal, withFlight);
-        if (flight == KnownState.Unknown) return new(EstimateKind.UnknownFlight, normal, withFlight);
-        var target = flight == KnownState.On ? withFlight : normal;
-        if (kills >= target.Max) return new(EstimateKind.RangeExceeded, normal, withFlight);
+        var target = flight switch
+        {
+            KnownState.On => withFlight,
+            KnownState.Off => normal,
+            _ => new KillRange(withFlight.Min, normal.Max),
+        };
+        var observed = Math.Max(0, kills);
+        if (observed >= target.Max) return new(EstimateKind.RangeExceeded, normal, withFlight);
+
+        var partial = !countComplete || kills < 0;
+        var estimateKind = partial ? EstimateKind.Partial :
+            flight == KnownState.Unknown ? EstimateKind.UnknownFlight : EstimateKind.Normal;
 
         // Closed passage rules out zero remaining, even after the published minimum.
-        return new(EstimateKind.Normal, normal, withFlight,
-            new(Math.Max(1, target.Min - kills), target.Max - kills));
+        // Missing kills can bring us closer than the observed count suggests, but cannot
+        // increase the maximum. Unknown Flight must cover both possible target ranges.
+        return new(estimateKind, normal, withFlight,
+            new(partial ? 1 : Math.Max(1, target.Min - observed), target.Max - observed));
     }
 }

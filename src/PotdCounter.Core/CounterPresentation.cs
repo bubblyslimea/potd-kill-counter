@@ -63,11 +63,11 @@ public readonly record struct CounterPresentation(
                 CounterTone.Neutral),
             EstimateKind.Open => ("OPEN", "passage",
                 "the game has confirmed the passage is open", CounterTone.Ready),
-            EstimateKind.Partial => ("?", "partial count",
-                "earlier or distant party kills may be missing, the observed count is not a full floor total",
+            EstimateKind.Partial => ($"~{estimate.Remaining}", "kills left · partial",
+                "earlier or distant kills may be missing, the range starts at one and only observed kills reduce its upper estimate",
                 CounterTone.Attention),
-            EstimateKind.UnknownFlight => ("?", "Flight not confirmed",
-                "Flight on this floor is unknown until there is enough observed floor history",
+            EstimateKind.UnknownFlight => ($"~{estimate.Remaining}", "kills left",
+                "Flight on this floor is unconfirmed, this wider range includes both normal and Flight targets",
                 CounterTone.Attention),
             EstimateKind.RangeExceeded => ("CHECK", "past the estimated range",
                 "the count has reached the published range, only the game can confirm an open passage",
@@ -79,7 +79,7 @@ public readonly record struct CounterPresentation(
             _ => ("WAIT", "waiting for PotD",
                 "the live counter follows Palace of the Dead", CounterTone.Neutral),
         };
-        return Present(main, caption, note, tone, estimate.Kind == EstimateKind.Normal);
+        return Present(main, caption, note, tone, estimate.Remaining is not null);
     }
 
     public static string FlightLabel(KnownState value, bool nextFloor = false) => value switch

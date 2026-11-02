@@ -81,7 +81,7 @@ internal sealed class SettingsWindow : Window
             ImGui.TextWrapped("the big number is a rough range of kills left\nthe game tells us when the passage opens");
             ImGui.TextWrapped("Flight this floor is already helping you\nFlight next floor means a use is queued for the next floor");
             ImGui.TextWrapped("FIRST FLOOR: Flight Unavailable describes the incoming effect on floor 1, not your pomander inventory\nyou can still use a pomander there for the next floor");
-            ImGui.TextWrapped("earlier or distant party kills may be missing if you join late or reconnect\na question mark keeps uncertain counts visible on the HUD");
+            ImGui.TextWrapped("earlier or distant party kills may be missing if you join late or reconnect\na wider amber range keeps kills left visible, partial counts stay labelled\nunknown Flight includes both possible targets");
         }
         if (ImGui.CollapsingHeader("status"))
         {

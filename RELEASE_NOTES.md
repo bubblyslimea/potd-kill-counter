@@ -1,24 +1,21 @@
-# read the state, keep moving
+# a count from the first floor
 
-the new HUD is here !!
+no Flight required !!
 
-big, crisp kills left, a clear Flight badge, and a separate reminder for the next floor
-lavender means active here, blue means Flight was activated for the next floor, amber calls out a boss ahead
-floor 1 gets the requested **FIRST FLOOR: Flight Unavailable** badge
+the first floor keeps its kills-left estimate above **FIRST FLOOR: Flight Unavailable**
+a fresh solo floor 1 starts at **~3–7**, then updates as kills are observed
 
-when the game confirms the passage is open, **OPEN** takes the main spot
-uncertain counts keep their question mark and a short reason
-observed kills, full ranges and explanations are in **run details** inside `/potd`
+if the counter joined late, it shows a wider range such as **~1–7**, with **kills left · partial**
+later starting floors also keep a rough estimate while incoming Flight is unknown
+the range covers both possible targets, the badge stays honest about the effect
 
-open `/potd preview` to try the new card, then `/potd` to choose from 15 examples
-`/potdcount` still works, and your placement, opacity and click-through settings are kept
-counting and Flight timing are unchanged
+the layout and counting hooks are unchanged
+an unavailable observer still pauses the estimate, and only the game can confirm **OPEN**
 
-update in `/xlplugins` using your existing [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json) with testing builds enabled
-both the `/plugins/repo.json` and `/notation/repo.json` addresses work, keep only one row
+update in `/xlplugins` through your existing [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json)
+`/potd preview` and `/potd` include fresh, late and later-set starting examples
 
-the first alpha has a positive live PotD report
-this update passed 2,287 offline assertions and compilation against the actual Dalamud host
-the layout study is labelled simulated, the new native rendering still needs its in-game look
+2,312 offline assertions passed, including the starting-floor paths through the actual tracker and bounds for missing kills
+the live starting-floor case still needs its in-game confirmation
 
 [installation and testing notes](https://github.com/bubblyslimea/potd-kill-counter/blob/main/TECHNICAL_DETAILS.md)
