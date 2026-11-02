@@ -2,9 +2,10 @@ namespace PotdCounter.Core;
 
 // A snapshot shared by the HUD and settings; preview data never touches the tracker.
 public readonly record struct CounterDisplay(int Floor, int Kills, KnownState Here, KnownState Next,
-    bool Open = false, bool Complete = true, bool Available = true)
+    bool Open = false, bool Complete = true, bool Available = true, bool InCombat = false)
 {
     public CounterPresentation Presentation => CounterPresentation.Create(Floor, Kills, Here, Open, Complete, Available, Next);
+    public bool HideForBossCombat => InCombat && FloorRules.Kind(Floor) == FloorKind.Boss;
 }
 
 public readonly record struct CounterExample(string Id, string Label, CounterDisplay State);
@@ -25,7 +26,10 @@ public static class CounterExamples
         new("unknown", "unknown Flight", new(193, 4, KnownState.Unknown, KnownState.Unknown)),
         new("exceeded", "range exceeded", new(193, 13, KnownState.Off, KnownState.Off)),
         new("paused", "tracking unavailable", new(193, 0, KnownState.Off, KnownState.Off, Available: false)),
-        new("boss", "boss floor", new(190, 0, KnownState.Off, KnownState.Off)),
+        new("boss", "boss · The Godfather", new(190, 0, KnownState.Off, KnownState.Off)),
+        new("boss-before", "boss before pull", new(180, 0, KnownState.Off, KnownState.Off)),
+        new("boss-combat", "boss fight · HUD hidden", new(180, 0, KnownState.Off, KnownState.Off, InCombat: true)),
+        new("boss-defeated", "boss cleared", new(180, 0, KnownState.Off, KnownState.Off, Open: true)),
         new("final-next", "final floor ahead", new(199, 4, KnownState.On, KnownState.Off)),
         new("complete", "floor 200", new(200, 0, KnownState.Off, KnownState.Off, Open: true)),
         new("boss-queued", "boss ahead with Flight observed", new(189, 2, KnownState.On, KnownState.On)),

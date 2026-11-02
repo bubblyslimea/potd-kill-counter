@@ -1,5 +1,15 @@
 # little changes
 
+## 0.1.4.0 · a little hello before the boss
+
+- each boss floor shows its name directly below **BOSS**
+- the HUD disappears when the client enters combat on a boss floor
+- it returns after combat ends, with your visibility preference still respected
+- normal-floor fights keep their kills-left counter
+- preview includes before, during and after a boss encounter
+
+boss names cover floors 10–190, floor 200 keeps its completion card
+
 ## 0.1.3.0 · a count from the first floor
 
 - kills left stay visible when incoming Flight is unavailable or unconfirmed

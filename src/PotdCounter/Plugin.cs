@@ -1,4 +1,5 @@
 using Dalamud.Game.Command;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.DutyState;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
@@ -44,7 +45,7 @@ public sealed class Plugin : IDalamudPlugin
     internal bool IsSimulated => !Tracker.Visible && Preview && CanPreview;
     internal CounterDisplay Display => IsSimulated ? PreviewData.Snapshot : new(
         Tracker.Visible ? Tracker.Floor : 0, Tracker.Kills, Tracker.FlightHere, Tracker.FlightNext,
-        Tracker.PassageOpen, Tracker.CountComplete, CounterAvailable);
+        Tracker.PassageOpen, Tracker.CountComplete, CounterAvailable, Condition[ConditionFlag.InCombat]);
 
     public Plugin()
     {

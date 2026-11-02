@@ -42,7 +42,7 @@ p{color:#b9bdc7;line-height:1.6;font-size:14px}.stage{display:grid;place-items:c
 details{margin-top:24px}summary{cursor:pointer;color:#e0b8ff}.foot{font-size:12px}[hidden]{display:none!important}
 @media(max-width:360px){body{padding:24px 8px}.stage{margin-left:-8px;margin-right:-8px}}
 </style>
-<main><div class="eyebrow">Riri's PotD Counter · 0.1.3</div><h1>read the state, keep moving</h1>
+<main><div class="eyebrow">Riri's PotD Counter · 0.1.4</div><h1>read the state, keep moving</h1>
 <p>the count up front, Flight where you expect it, details in /potd when you need them</p>
 <p class="foot">layout study · simulated values · not an in-game capture</p>
 <section class="stage" aria-label="Simulated HUD"><div class="hud" id="hud">
@@ -51,7 +51,7 @@ details{margin-top:24px}summary{cursor:pointer;color:#e0b8ff}.foot{font-size:12p
 <div class="caption" id="caption"></div>
 <div class="badge" id="badge"><span class="status" id="status"></span><span class="detail" id="detail"></span></div>
 <div class="notice" id="next"></div><div class="notice" id="destination"></div>
-</div></section><nav class="controls" id="controls" aria-label="Example states"></nav>
+</div><p id="combat-hidden" hidden>boss combat · HUD hidden</p></section><nav class="controls" id="controls" aria-label="Example states"></nav>
 <details><summary>run details · these live in /potd settings</summary><p id="observed"></p><p id="range"></p><p id="note"></p></details>
 <p class="foot">these examples come from the plugin's actual presentation model<br>the headline uses the shipped font, supporting text approximates Dalamud's font</p></main>
 <script>
@@ -59,6 +59,7 @@ const scenes=SCENES_JSON,colors=COLORS_JSON,fills=FILLS_JSON;
 const $=id=>document.getElementById(id);
 function show(s){
  const v=s.view,b=v.Flight;
+ $('hud').hidden=s.hidden;$('combat-hidden').hidden=!s.hidden;
  $('floor').textContent='floor '+s.floor;
  $('headline').textContent=v.Main;$('headline').style.color=colors[v.Tone];
  $('check').toggleAttribute('hidden',v.Main!=='OPEN');$('hud').classList.toggle('ready',v.Tone===1);
@@ -117,7 +118,7 @@ parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="720" view
          '<g font-family="DejaVu Sans,Arial,sans-serif">',
          text(36, 49, "Riri's PotD Counter", 28, "#f7f7fc"),
          text(36, 80, "read the state, keep moving", 17, "#e0b8ff")]
-for index, scene_id in enumerate(["first", "flight", "normal", "both", "boss-next", "open"]):
+for index, scene_id in enumerate(["first", "flight", "normal", "both", "boss-before", "open"]):
     s = next(s for s in scenes if s["id"] == scene_id)
     v, x, y = s["view"], 36 + (index % 3) * 344, 128 + (index // 3) * 280
     b = v["Flight"]

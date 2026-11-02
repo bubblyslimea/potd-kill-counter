@@ -11,8 +11,9 @@ internal sealed class PreviewState
     public bool PassageOpen;
     public bool Partial;
     public bool Unavailable;
+    public bool InCombat;
 
-    public CounterDisplay Snapshot => new(Floor, Kills, Flight, Queued, PassageOpen, !Partial, !Unavailable);
+    public CounterDisplay Snapshot => new(Floor, Kills, Flight, Queued, PassageOpen, !Partial, !Unavailable, InCombat);
 
     public void Use(CounterDisplay state)
     {
@@ -23,5 +24,6 @@ internal sealed class PreviewState
         PassageOpen = state.Open;
         Partial = !state.Complete;
         Unavailable = !state.Available;
+        InCombat = state.InCombat;
     }
 }

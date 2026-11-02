@@ -28,6 +28,31 @@ public static class FloorRules
         _ => FloorKind.Normal,
     };
 
+    // English names verified against the linked floor guides in FLOOR_RANGES.md.
+    public static string? BossName(int floor) => floor switch
+    {
+        10 => "Palace Deathgaze",
+        20 => "Spurge",
+        30 => "Ningishzida",
+        40 => "Ixtab",
+        50 => "Edda Blackbosom",
+        60 => "The Black Rider",
+        70 => "Yaquaru",
+        80 => "Gudanna",
+        90 => "The Godmother",
+        100 => "Nybeth Obdilord",
+        110 => "Alicanto",
+        120 => "Kirtimukha",
+        130 => "Alfard",
+        140 => "Ah Puch",
+        150 => "Tisiphone",
+        160 => "Todesritter",
+        170 => "Yulunggu",
+        180 => "Dendainsonne",
+        190 => "The Godfather",
+        _ => null,
+    };
+
     public static KillRange? UsualRange(int floor) =>
         Kind(floor) == FloorKind.Normal ? Ranges[(floor - 1) / 10] : null;
 

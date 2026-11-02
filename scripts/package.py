@@ -57,7 +57,7 @@ def package():
     entry.update({"AssemblyVersion": "0.0.0.0", "TestingAssemblyVersion": version,
                   "TestingDalamudApiLevel": 15, "IsTestingExclusive": True, "IsHide": False,
                   "AcceptsFeedback": False, "DownloadLinkInstall": link, "DownloadLinkUpdate": link,
-                  "DownloadLinkTesting": link, "TestingChangelog": "a count from the first floor\n\nno Flight required, kills left stay visible\nfloor 1 keeps its Flight Unavailable badge under the estimate\nuncertain starts use a wider range, partial counts stay labelled\n/potd preview includes fresh, late and later-set starts"})
+                  "DownloadLinkTesting": link, "TestingChangelog": "a little hello before the boss\n\nBOSS now shows the boss name underneath\nthe HUD disappears during boss combat and returns afterwards\nordinary-floor fights keep the counter visible\ntry the before, during and after examples in /potd preview"})
     (OUT / "repo.json").write_text(json.dumps([entry], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     record = {"version": version, "tag": release["tag"], "channel": release["channel"],
               "archiveSha256": digest, "files": {name: sha(data) for name, data in sorted(files.items())}}

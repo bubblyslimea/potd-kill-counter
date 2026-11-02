@@ -1,5 +1,22 @@
 # Riri's PotD Counter · Asura design
 
+## 0.1.4 boss presentation
+
+name the boss before the pull and remove the combat HUD while the player fights it
+each boss floor from 10 through 190 shows `BOSS` with the verified boss name in the existing caption position
+floor 200 remains completion
+
+keep the existing C# / Dalamud stack and fixed card layout
+put the floor-to-name mapping in the pure floor rules, caption selection in presentation, and a boss-only visibility rule on the display snapshot
+the live snapshot reads Dalamud's `InCombat` condition at draw time so hiding does not wait for the 200 ms floor poll
+preview uses its own pretend combat flag and the same visibility rule
+combat hiding changes neither the user's visibility preference nor the background tracker
+the HUD can return after combat ends, with confirmed passage activation taking the usual priority
+
+sequence: verify all 19 names against the linked floor guides, add the mapping and visibility rule, connect the host condition and preview, then check pre-pull, combat, post-combat and ordinary-floor behavior
+compile against the actual host and review the named-boss preview before publishing a testing update
+native combat-flag timing still needs an in-game check
+
 ## 0.1.3 starting-floor correction
 
 keep the kills-left estimate visible even when no incoming Flight applies or its state is unknown

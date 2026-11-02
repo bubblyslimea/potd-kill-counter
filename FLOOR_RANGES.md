@@ -38,6 +38,35 @@ floor 200 is the completion floor
 the wider estimates retain rare 3/9 outcomes on 41–49 and 91–99, and rare 10 outcomes on 101–149. These are observed community ranges, not a guarantee that every floor must hit those exact limits
 
 example: on floor 193, after four observed kills and with passage still closed, the estimate is **1–9 more** normally or **1–3 more** with Flight active
-with an incomplete count or unknown Flight, the plugin shows the total target range and marks the remainder unknown
+with an incomplete count or unknown Flight, the plugin shows a wider, qualified remaining range
+partial counts start at one, unknown Flight covers both possible targets
 
 [General mechanics](https://www.ddcompendium.com/knowledge.html) · [Flight](https://www.ddcompendium.com/pomanders.html)
+
+## boss names
+
+verified against each linked Deep Dungeon Compendium guide on 2026-11-02
+these names appear below **BOSS** before combat, the HUD hides while the client reports combat on a boss floor
+floor 200 has no boss entry
+
+| Floor | Boss | Source |
+| --- | --- | --- |
+| 10 | Palace Deathgaze | [Floor guide](https://www.ddcompendium.com/potd_floorsets/001.html) |
+| 20 | Spurge | [Floor guide](https://www.ddcompendium.com/potd_floorsets/011.html) |
+| 30 | Ningishzida | [Floor guide](https://www.ddcompendium.com/potd_floorsets/021.html) |
+| 40 | Ixtab | [Floor guide](https://www.ddcompendium.com/potd_floorsets/031.html) |
+| 50 | Edda Blackbosom | [Floor guide](https://www.ddcompendium.com/potd_floorsets/041.html) |
+| 60 | The Black Rider | [Floor guide](https://www.ddcompendium.com/potd_floorsets/051.html) |
+| 70 | Yaquaru | [Floor guide](https://www.ddcompendium.com/potd_floorsets/061.html) |
+| 80 | Gudanna | [Floor guide](https://www.ddcompendium.com/potd_floorsets/071.html) |
+| 90 | The Godmother | [Floor guide](https://www.ddcompendium.com/potd_floorsets/081.html) |
+| 100 | Nybeth Obdilord | [Floor guide](https://www.ddcompendium.com/potd_floorsets/091.html) |
+| 110 | Alicanto | [Floor guide](https://www.ddcompendium.com/potd_floorsets/101.html) |
+| 120 | Kirtimukha | [Floor guide](https://www.ddcompendium.com/potd_floorsets/111.html) |
+| 130 | Alfard | [Floor guide](https://www.ddcompendium.com/potd_floorsets/121.html) |
+| 140 | Ah Puch | [Floor guide](https://www.ddcompendium.com/potd_floorsets/131.html) |
+| 150 | Tisiphone | [Floor guide](https://www.ddcompendium.com/potd_floorsets/141.html) |
+| 160 | Todesritter | [Floor guide](https://www.ddcompendium.com/potd_floorsets/151.html) |
+| 170 | Yulunggu | [Floor guide](https://www.ddcompendium.com/potd_floorsets/161.html) |
+| 180 | Dendainsonne | [Floor guide](https://www.ddcompendium.com/potd_floorsets/171.html) |
+| 190 | The Godfather | [Floor guide](https://www.ddcompendium.com/potd_floorsets/181.html) |

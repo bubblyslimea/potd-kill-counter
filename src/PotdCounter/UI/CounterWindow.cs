@@ -32,7 +32,7 @@ internal sealed class CounterWindow : Window, IDisposable
     }
 
     public override bool DrawConditions() =>
-        plugin.Config.ShowOverlay && (plugin.Tracker.Visible || plugin.IsSimulated);
+        plugin.Config.ShowOverlay && (plugin.Tracker.Visible || plugin.IsSimulated) && !plugin.Display.HideForBossCombat;
 
     public override void PreDraw()
     {

@@ -9,6 +9,8 @@ a little counter for the climb
 keeps track of the kills you see, your Flight pomanders, and roughly how much might be left
 when the passage opens, it lets you know
 
+boss floors show who you are about to face, then the HUD steps away while you fight
+
 no Flight required, the first floor still gets a kills-left estimate
 if earlier kills or Flight are uncertain, the range gets wider and stays labelled
 

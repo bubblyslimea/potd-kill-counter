@@ -272,6 +272,35 @@ Check(PassageEstimator.Estimate(193, 13, KnownState.Unknown, false, false).Kind 
 Check(PassageEstimator.Estimate(1, -1, KnownState.Off, false, true).Remaining == new KillRange(1, 7),
     "invalid negative counts are treated as partial without inflating the maximum");
 
+// Boss identity belongs to the floor, independent of targets, kill tracking or Flight.
+Check(FloorRules.BossName(10) == "Palace Deathgaze" && FloorRules.BossName(50) == "Edda Blackbosom" &&
+      FloorRules.BossName(100) == "Nybeth Obdilord" && FloorRules.BossName(180) == "Dendainsonne" &&
+      FloorRules.BossName(190) == "The Godfather", "named early, story and deep bosses");
+var namedBosses = Enumerable.Range(1, 200).Where(f => FloorRules.BossName(f) is not null).ToArray();
+Check(namedBosses.SequenceEqual(Enumerable.Range(1, 19).Select(i => i * 10)),
+    "exactly 19 boss floors have names, completion does not");
+foreach (var floor in namedBosses)
+{
+    view = CounterPresentation.Create(floor, 0, KnownState.Unknown, false, false, false);
+    Check(view.Main == "BOSS" && view.Caption == FloorRules.BossName(floor) && view.Range is null,
+        "boss name appears below BOSS even when ordinary counting is unavailable");
+}
+var beforeBoss = new CounterDisplay(180, 0, KnownState.Off, KnownState.Off);
+Check(!beforeBoss.HideForBossCombat && beforeBoss.Presentation.Caption == "Dendainsonne",
+    "boss card is visible before the pull");
+var duringBoss = beforeBoss with { InCombat = true };
+Check(duringBoss.HideForBossCombat, "boss combat hides the entire HUD");
+Check((duringBoss with { Open = true, Available = false }).HideForBossCombat,
+    "boss HUD stays hidden until combat ends even if the passage opens first");
+var afterBoss = duringBoss with { InCombat = false, Open = true };
+Check(!afterBoss.HideForBossCombat && afterBoss.Presentation.Main == "OPEN",
+    "ending combat restores the confirmed passage card");
+Check(!(duringBoss with { InCombat = false }).HideForBossCombat,
+    "combat cancellation restores the boss card without a permanent visibility latch");
+foreach (var floor in new[] { 1, 9, 11, 179, 181, 193, 199, 200 })
+    Check(!(duringBoss with { Floor = floor }).HideForBossCombat,
+        "ordinary combat and completion never trigger boss-only hiding");
+
 Console.WriteLine($"PASS: {checks} assertions; all 200 floors, Flight, deaths, transitions, uncertainty, passage priority and presentation.");
 
 // Shared examples drive native preview controls and the external labelled studies.
@@ -279,7 +308,7 @@ if (args.Length == 2 && args[0] == "--export-preview")
 {
     var scenes = CounterExamples.All.Select(s => new
     {
-        id = s.Id, label = s.Label, floor = s.State.Floor,
+        id = s.Id, label = s.Label, floor = s.State.Floor, hidden = s.State.HideForBossCombat,
         view = s.State.Presentation,
     });
     File.WriteAllText(args[1], System.Text.Json.JsonSerializer.Serialize(scenes));

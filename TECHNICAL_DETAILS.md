@@ -2,7 +2,7 @@
 
 ## this build
 
-0.1.3.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
+0.1.4.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
 the release ZIP contains one plugin assembly, its manifest and dependency description, plus the license and acknowledgements
 Dalamud supplies the host assemblies, they are not included in the download
 
@@ -70,6 +70,19 @@ unknown incoming Flight spans both normal and Flight targets, keeping a rough ra
 these are conservative estimates, never a claim to know the hidden quota or the missing kill count
 the floor's target ranges and actual passage state remain available
 boss floors 10–190 have no normal quota, floor 200 is completion
+each boss floor shows `BOSS` with its verified English name immediately underneath
+the name is selected from the floor number, so targeting the boss is not required
+
+the HUD hides while Dalamud reports `ConditionFlag.InCombat` on a boss floor
+this flag is read at draw time, independently of the 200 ms floor poll
+the same flag does not hide the HUD during ordinary-floor combat
+when combat ends, the HUD returns if the user's display preference still permits it
+the tracker keeps running while hidden, and the game-confirmed passage state retains priority
+settings remain available through `/potd`, preview combat uses a separate pretend flag
+
+names are linked in [the floor reference](FLOOR_RANGES.md)
+the combat signal is the supported [Dalamud client condition](https://dalamud.dev/api/Dalamud.Game.ClientState.Conditions/Enums/ConditionFlag/)
+its timing in live solo and party boss fights remains an in-game verification item
 
 ## make it comfortable
 
@@ -112,7 +125,7 @@ font handles are created once and disposed on unload
 the 320 × 232 logical-pixel card keeps the same layout across states, with an extra simulation banner above previews
 saved placement, lock and opacity are retained, new installations default to 96% opacity
 
-`PREVIEW.html` is an interactive layout study with the same 17 examples used by the native preview controls
+`PREVIEW.html` is an interactive layout study with the same 20 examples used by the native preview controls
 the README visual is also a labelled layout preview, neither is an in-game capture
 the native simulation command lets you inspect the actual overlay without entering PotD
 

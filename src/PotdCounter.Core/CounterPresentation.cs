@@ -72,7 +72,7 @@ public readonly record struct CounterPresentation(
             EstimateKind.RangeExceeded => ("CHECK", "past the estimated range",
                 "the count has reached the published range, only the game can confirm an open passage",
                 CounterTone.Attention),
-            EstimateKind.Boss => ("BOSS", "no monster quota",
+            EstimateKind.Boss => ("BOSS", FloorRules.BossName(floor) ?? "boss floor",
                 "the normal monster ranges do not apply on boss floors", CounterTone.Neutral),
             EstimateKind.Complete => ("CLEAR", "you made it !!",
                 "floor 200 is the completion floor", CounterTone.Ready),

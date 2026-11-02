@@ -1,21 +1,18 @@
-# a count from the first floor
+# a little hello before the boss
 
-no Flight required !!
+now you get to see who is waiting for you !!
 
-the first floor keeps its kills-left estimate above **FIRST FLOOR: Flight Unavailable**
-a fresh solo floor 1 starts at **~3–7**, then updates as kills are observed
+each boss floor shows **BOSS** with the boss name right underneath
+when the fight starts and the game puts you in combat, the HUD disappears
+it returns when combat ends, ready to show the passage opening
 
-if the counter joined late, it shows a wider range such as **~1–7**, with **kills left · partial**
-later starting floors also keep a rough estimate while incoming Flight is unknown
-the range covers both possible targets, the badge stays honest about the effect
-
-the layout and counting hooks are unchanged
-an unavailable observer still pauses the estimate, and only the game can confirm **OPEN**
+normal-floor fights keep the counter visible
+boss names cover floors 10–190, floor 200 stays the completion floor
 
 update in `/xlplugins` through your existing [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json)
-`/potd preview` and `/potd` include fresh, late and later-set starting examples
+try `/potd preview`, then open `/potd` and choose the before, during or after boss examples
 
-2,312 offline assertions passed, including the starting-floor paths through the actual tracker and bounds for missing kills
-the live starting-floor case still needs its in-game confirmation
+the offline checks cover boss names, combat hiding and restoration, ordinary-floor visibility and the existing counting rules
+the native combat transition still needs its in-game confirmation
 
 [installation and testing notes](https://github.com/bubblyslimea/potd-kill-counter/blob/main/TECHNICAL_DETAILS.md)

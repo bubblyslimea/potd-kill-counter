@@ -41,6 +41,8 @@ internal sealed class SettingsWindow : Window
             if (ImGui.Checkbox("include the estimated floor total", ref c.ShowRanges)) plugin.Save();
             if (c.ShowRanges && view.Range is { } range) ImGui.TextWrapped(range);
             ImGui.TextWrapped(view.Note);
+            if (state.HideForBossCombat)
+                ImGui.TextUnformatted("counter hidden during this boss fight");
             if (view.ShowFlight)
             {
                 ImGui.TextUnformatted($"Flight this floor: {CounterPresentation.FlightLabel(state.Here)}");
@@ -71,7 +73,10 @@ internal sealed class SettingsWindow : Window
                 ImGui.Checkbox("passage is open", ref p.PassageOpen);
                 ImGui.Checkbox("partial count", ref p.Partial);
                 ImGui.Checkbox("kill tracking unavailable", ref p.Unavailable);
+                ImGui.Checkbox("in combat", ref p.InCombat);
             }
+            if (plugin.IsSimulated && p.Snapshot.HideForBossCombat)
+                ImGui.TextWrapped("boss combat · counter hidden\nchoose another example or turn off in combat to see it again");
             ImGui.TextWrapped("pretend values, your real run takes over inside PotD");
         }
 
@@ -79,6 +84,7 @@ internal sealed class SettingsWindow : Window
         if (ImGui.CollapsingHeader("about the count"))
         {
             ImGui.TextWrapped("the big number is a rough range of kills left\nthe game tells us when the passage opens");
+            ImGui.TextWrapped("boss floors show the boss name before the pull\nthe counter hides during boss combat and returns afterwards\nit stays visible during ordinary-floor fights");
             ImGui.TextWrapped("Flight this floor is already helping you\nFlight next floor means a use is queued for the next floor");
             ImGui.TextWrapped("FIRST FLOOR: Flight Unavailable describes the incoming effect on floor 1, not your pomander inventory\nyou can still use a pomander there for the next floor");
             ImGui.TextWrapped("earlier or distant party kills may be missing if you join late or reconnect\na wider amber range keeps kills left visible, partial counts stay labelled\nunknown Flight includes both possible targets");
