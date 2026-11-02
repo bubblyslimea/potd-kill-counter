@@ -57,7 +57,7 @@ def package():
     entry.update({"AssemblyVersion": "0.0.0.0", "TestingAssemblyVersion": version,
                   "TestingDalamudApiLevel": 15, "IsTestingExclusive": True, "IsHide": False,
                   "AcceptsFeedback": False, "DownloadLinkInstall": link, "DownloadLinkUpdate": link,
-                  "DownloadLinkTesting": link, "TestingChangelog": "a little counter for the climb\n\ncounts observed kills, remembers Flight and gives a rough passage estimate\nlive PotD checks are still pending"})
+                  "DownloadLinkTesting": link, "TestingChangelog": "a little more room to breathe\n\n/potd works now too\na larger kills-left estimate, clearer Flight states and details you can tuck away\nthe new layout is ready for an in-game look"})
     (OUT / "repo.json").write_text(json.dumps([entry], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     record = {"version": version, "tag": release["tag"], "channel": release["channel"],
               "archiveSha256": digest, "files": {name: sha(data) for name, data in sorted(files.items())}}

@@ -13,12 +13,17 @@ when the passage opens, it lets you know
 
 1. add the [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json) in `/xlsettings` → **Experimental → Custom Plugin Repositories** and save
 2. enable **Get plugin testing builds**, then find **Riri's PotD Counter** in `/xlplugins` and install
-3. open `/potdcount` to settle it into place, or `/potdcount preview` to try it outside PotD
+3. open `/potd` to settle it into place, or `/potd preview` to try it outside PotD
+
+`/potdcount` still works too
+
+the big number is the rough **kills left**, with Flight split into **this floor** and **next floor**
+open **details** when you want the full floor range, the rest stays tucked away
 
 already using the Pages `/notation/repo.json` address? that row works too, you only need one
 
-this is an early alpha, live PotD checks are still pending
-please try a low-floor run before taking it into an important climb
+the first alpha has a positive live PotD report, this update gives the counter a little more room to breathe
+the new layout is still in testing while it gets an in-game look
 
 ![the shared repository page with Notation and the counter](assets/shared-repository.jpg)
 

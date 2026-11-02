@@ -2,7 +2,7 @@
 
 ## this build
 
-0.1.0.0 is the first alpha, built for Dalamud API 15, .NET 10 and Windows x64
+0.1.1.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
 the release ZIP contains one plugin assembly, its manifest and dependency description, plus the license and acknowledgements
 Dalamud supplies the host assemblies, they are not included in the download
 
@@ -15,7 +15,7 @@ GitHub and the shared catalog are used by the installer for downloads and update
 2. add `https://give-riri-a-cookie.pages.dev/plugins/repo.json`, click **+** and **Save**
 3. enable **Get plugin testing builds** in **Experimental**, save, then open `/xlplugins` and install **Riri's PotD Counter**
 
-this first release is testing-only, it may be hidden until testing builds are enabled
+this release is testing-only, it may be hidden until testing builds are enabled
 the existing `https://give-riri-a-cookie.pages.dev/notation/repo.json` address serves the same catalog, keep only one of these rows
 the old Netlify site's availability depends on its own hosting state, use the Pages address for a new installation
 
@@ -44,7 +44,7 @@ its client flag describes a use queued for the next floor, an inventory decrease
 once observed, the queue stays latched for the current floor so a flag clearing just before transition does not erase it
 a witnessed consecutive floor change carries that queue into **Flight here**
 the next queue gets 750 ms to settle, a persisting old flag must clear before a fresh use is accepted
-that timing and the native client interpretation still need live confirmation
+the first alpha has a positive general live report, specific transition edge cases still need their own in-game checks
 
 loading mid-floor leaves current Flight unknown
 even a fresh set above floor 1 may inherit a Flight from the previous set, this version does not persist that history across separate instances
@@ -71,16 +71,25 @@ boss floors 10–190 have no normal quota, floor 200 is completion
 
 | command | what it does |
 | --- | --- |
-| `/potdcount` | opens settings |
-| `/potdcount toggle` | shows or hides the automatic overlay |
-| `/potdcount preview` | tries a labelled simulation outside PotD |
+| `/potd` | opens settings |
+| `/potd toggle` | shows or hides the automatic overlay |
+| `/potd preview` | tries a labelled simulation outside PotD |
+
+`/potdcount` accepts the same commands for compatibility
+starting a preview also makes a hidden overlay visible
 
 drag the background while unlocked, right-click it to open settings
-locking also enables click-through, `/potdcount` lets you unlock it again
+locking also enables click-through, `/potd` lets you unlock it again
+**details** expands the floor total and explanation, **keep details open** in settings also works while the overlay is locked
+the short command is registered only if available, a conflicting plugin command is left intact
 Dalamud remembers the placement and the plugin saves display preferences
 preview values never affect the live tracker
 
-`PREVIEW.html` is a layout study with example data exported by the real C# estimator
+the compact card leads with the estimated kills left, then separates Flight this floor from Flight next floor
+partial counts and unknown Flight remain visible even with details closed, completion hides next-floor information
+settings put explanations and reader status behind separate expanders
+
+`PREVIEW.html` is an interactive layout study with example data exported by the real C# presentation model
 the README visual is also a labelled layout preview, neither is an in-game capture
 the native simulation command lets you inspect the actual overlay without entering PotD
 
@@ -112,7 +121,7 @@ existing assets are compared by checksum, a changed build needs a new version
 the release includes `repo.json`, `PotdCounter.zip`, its checksum and a file-hash record
 the catalog must only be updated after those downloads have been verified
 
-the first feed entry has `IsTestingExclusive: true`, with the real version in `TestingAssemblyVersion`
+the feed entry has `IsTestingExclusive: true`, with the real version in `TestingAssemblyVersion`
 live testing should precede a stable promotion, public source and a downloadable alpha do not imply that in-game validation is complete
 
 ## finding your way around
@@ -122,6 +131,7 @@ live testing should precede a stable promotion, public source and a downloadable
 | `src/PotdCounter.Core/FloorRules.cs` | floor ranges and Flight rounding |
 | `src/PotdCounter.Core/FloorTracker.cs` | counts, confidence and floor transitions |
 | `src/PotdCounter.Core/PassageEstimator.cs` | estimates from observed facts |
+| `src/PotdCounter.Core/CounterPresentation.cs` | main answer, supporting text and visible uncertainty |
 | `src/PotdCounter/Game/PotdReader.cs` | client data adapter |
 | `src/PotdCounter/Game/EnemyDeathObserver.cs` | death observations |
 | `src/PotdCounter/UI/` | counter and settings windows |

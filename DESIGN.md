@@ -1,5 +1,34 @@
 # Riri's PotD Counter · Asura design
 
+## 0.1.1 display brief
+
+help a runner read the next useful answer in one glance, with `/potd` as the short way back to settings
+
+the first live user report says the counter works well, but the display feels crowded
+this revision changes the presentation and commands while keeping counting, floor rules, Flight timing and polling intact
+
+- one prominent answer: the estimated kills left, or the actual passage state
+- floor and observed kills form a quiet context row
+- Flight has two aligned columns explicitly labelled **this floor** and **next floor**, each with a written state
+- total ranges and explanations live behind **details**, closed by default
+uncertainty stays visible in the main card even when details are closed
+- green means the passage is open or Flight is confirmed, amber marks uncertainty, pink is a small Riri accent
+text carries every meaning too
+- `/potd` and `/potdcount` share the settings, preview and toggle commands
+only successfully registered commands are removed on disposal
+- keep existing position, opacity, lock and range preferences, with a new independent detail preference
+
+the design takes its cues from Google's [simpler Maps home screen](https://blog.google/products-and-platforms/products/maps/google-maps-updates-summer-travel-2024/) and its [work on color and hierarchy](https://design.google/library/exploring-color-google-maps)
+the application here is our design choice: one main answer above optional supporting detail, using the existing native overlay
+
+use the current C# / Dalamud / ImGui stack with no new runtime dependencies
+the estimator supplies facts to a small pure presentation model, which selects the main answer, caveat and supporting text
+the window places those fields, settings control visibility, and both commands enter the same handler
+
+implementation order: add the command alias, verify the presentation states, connect the compact window, then refresh the labelled previews and publish a new testing version
+verify all existing core checks plus open-state priority, partial and unavailable counts, unknown Flight and boss/completion presentation
+compile against the actual host, inspect the layout study, and record that the new native appearance still needs in-game review
+
 ## build brief
 
 build a lightweight, automatic Dalamud overlay for Palace of the Dead that counts observed enemy kills on each floor, estimates the kills still required to activate the Cairn of Passage, and distinguishes Flight active on this floor from Flight queued for the next

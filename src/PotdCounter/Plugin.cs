@@ -27,13 +27,14 @@ public sealed class Plugin : IDalamudPlugin
     private readonly PotdReader reader;
     private readonly EnemyDeathObserver deaths;
     private readonly SettingsWindow settings;
+    private readonly List<string> registeredCommands = [];
     private long nextRead;
     private long freshEntranceUntil;
     private bool readErrorLogged;
 
     internal FloorTracker Tracker { get; } = new();
     internal Configuration Config { get; }
-    internal bool Preview { get; set; }
+    internal bool Preview { get; private set; }
     internal PreviewState PreviewData { get; } = new();
     internal bool CanPreview { get; private set; } = true;
     internal bool CounterAvailable => deaths.Available && !deaths.Faulted;
@@ -48,10 +49,16 @@ public sealed class Plugin : IDalamudPlugin
         settings = new(this);
         windows.AddWindow(new CounterWindow(this));
         windows.AddWindow(settings);
-        Commands.AddHandler("/potdcount", new CommandInfo(OnCommand)
+        foreach (var command in new[] { "/potd", "/potdcount" })
         {
-            HelpMessage = "open the counter settings | /potdcount preview tries a simulation | /potdcount toggle shows or hides the counter",
-        });
+            if (Commands.AddHandler(command, new CommandInfo(OnCommand)
+                {
+                    HelpMessage = "open the counter settings | /potd preview tries a simulation | /potd toggle shows or hides the counter",
+                }))
+                registeredCommands.Add(command);
+            else
+                Log.Warning("Could not register {Command}; another command may already use it", command);
+        }
         Framework.Update += Update;
         Duty.DutyStarted += OnDutyStarted;
         Client.Logout += OnLogout;
@@ -136,7 +143,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         switch (args.Trim().ToLowerInvariant())
         {
-            case "preview": Preview = !Preview; break;
+            case "preview": SetPreview(!Preview); break;
             case "toggle": Config.ShowOverlay = !Config.ShowOverlay; Save(); break;
             default: OpenSettings(); break;
         }
@@ -144,6 +151,14 @@ public sealed class Plugin : IDalamudPlugin
 
     internal void Save() => PluginInterface.SavePluginConfig(Config);
     internal void OpenSettings() => settings.IsOpen = true;
+
+    internal void SetPreview(bool enabled)
+    {
+        Preview = enabled;
+        if (!enabled || Config.ShowOverlay) return;
+        Config.ShowOverlay = true;
+        Save();
+    }
 
     public void Dispose()
     {
@@ -154,7 +169,7 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.Draw -= windows.Draw;
         PluginInterface.UiBuilder.OpenConfigUi -= OpenSettings;
         PluginInterface.UiBuilder.OpenMainUi -= OpenSettings;
-        Commands.RemoveHandler("/potdcount");
+        foreach (var command in registeredCommands) Commands.RemoveHandler(command);
         windows.RemoveAllWindows();
     }
 }

@@ -123,19 +123,61 @@ Check(PassageEstimator.Estimate(190, 0, KnownState.On, false, true).Kind == Esti
 Check(PassageEstimator.Estimate(200, 0, KnownState.On, true, true).Kind == EstimateKind.Complete,
     "completion wins at 200");
 
-Console.WriteLine($"PASS: {checks} assertions; all 200 floors, Flight, deaths, transitions, uncertainty and passage override.");
+// The compact view must never hide uncertainty or manufacture progress.
+var view = CounterPresentation.Create(193, 4, KnownState.Off, false, true);
+Check(view.IsEstimate && view.Main == "~1–9" && view.Caption == "estimated kills left",
+    "normal card separates an approximate remaining range from its unit");
+Check(view.Observed == "4 kills observed" && view.Range!.Contains("5–13"),
+    "observed kills stay distinct from the total target");
+view = CounterPresentation.Create(193, 4, KnownState.On, false, true);
+Check(view.Main == "~1–3" && view.Range!.Contains("3–7"), "active Flight adjusts displayed ranges");
+view = CounterPresentation.Create(193, 3, KnownState.Unknown, false, false);
+Check(!view.IsEstimate && view.Caption == "partial count" && view.Tone == CounterTone.Attention,
+    "partial counts remain visibly qualified with details closed");
+view = CounterPresentation.Create(193, 4, KnownState.Unknown, false, true);
+Check(!view.IsEstimate && view.Caption == "Flight not confirmed", "unknown Flight is not displayed as off");
+Check(CounterPresentation.FlightLabel(KnownState.On) == "active" &&
+      CounterPresentation.FlightLabel(KnownState.On, true) == "queued" &&
+      CounterPresentation.FlightLabel(KnownState.Unknown, true) == "unknown",
+    "Flight wording distinguishes current, next and unknown states");
+view = CounterPresentation.Create(193, 13, KnownState.Off, false, true);
+Check(!view.IsEstimate && view.Main == "check the passage" && view.Tone == CounterTone.Attention,
+    "the range ceiling never presents an open passage");
+view = CounterPresentation.Create(193, 4, KnownState.Off, false, true, false);
+Check(!view.IsEstimate && view.Observed is null && view.Main == "tracking paused",
+    "unavailable observer cannot present a trustworthy count or remainder");
+foreach (var available in new[] { false, true })
+foreach (var complete in new[] { false, true })
+{
+    view = CounterPresentation.Create(193, 100, KnownState.Unknown, true, complete, available);
+    Check(view.Main == "passage open" && view.Tone == CounterTone.Ready && !view.IsEstimate,
+        "confirmed passage wins over every observer and confidence state");
+}
+view = CounterPresentation.Create(190, 0, KnownState.On, false, true, false);
+Check(view.Main == "boss floor" && view.Observed is null && view.Range is null,
+    "boss floors retain their own state even when counting is unavailable");
+view = CounterPresentation.Create(200, 0, KnownState.Unknown, true, false, false);
+Check(view.Tone == CounterTone.Ready && !view.ShowFlight && view.Range is null,
+    "completion has no fictional next floor or monster target");
+view = CounterPresentation.Create(0, 0, KnownState.Unknown, false, false);
+Check(!view.ShowFlight && !view.IsEstimate && view.Observed is null, "outside view has no stale floor facts");
+
+Console.WriteLine($"PASS: {checks} assertions; all 200 floors, Flight, deaths, transitions, uncertainty, passage priority and presentation.");
 
 // Optional review fixtures are produced by the actual estimator, not a JavaScript copy.
 if (args.Length == 2 && args[0] == "--export-preview")
 {
     var scenes = new[]
     {
-        (Id: "normal", Label: "Normal floor", Floor: 193, Kills: 4, Here: KnownState.Off, Next: KnownState.On, Open: false, Full: true),
-        (Id: "flight", Label: "Flight active", Floor: 193, Kills: 4, Here: KnownState.On, Next: KnownState.Off, Open: false, Full: true),
-        (Id: "open", Label: "Passage open", Floor: 193, Kills: 7, Here: KnownState.Off, Next: KnownState.On, Open: true, Full: true),
-        (Id: "partial", Label: "Joined mid-floor", Floor: 193, Kills: 3, Here: KnownState.Unknown, Next: KnownState.Off, Open: false, Full: false),
-        (Id: "boss", Label: "Boss floor", Floor: 190, Kills: 0, Here: KnownState.Off, Next: KnownState.Off, Open: false, Full: true),
-        (Id: "complete", Label: "Floor 200", Floor: 200, Kills: 0, Here: KnownState.Off, Next: KnownState.Off, Open: true, Full: true),
+        (Id: "normal", Label: "normal floor", Floor: 193, Kills: 4, Here: KnownState.Off, Next: KnownState.On, Open: false, Full: true, Available: true),
+        (Id: "flight", Label: "Flight active", Floor: 193, Kills: 4, Here: KnownState.On, Next: KnownState.Off, Open: false, Full: true, Available: true),
+        (Id: "open", Label: "passage open", Floor: 193, Kills: 7, Here: KnownState.Off, Next: KnownState.On, Open: true, Full: true, Available: true),
+        (Id: "partial", Label: "partial count", Floor: 193, Kills: 3, Here: KnownState.Unknown, Next: KnownState.Off, Open: false, Full: false, Available: true),
+        (Id: "unknown", Label: "unknown Flight", Floor: 193, Kills: 4, Here: KnownState.Unknown, Next: KnownState.Unknown, Open: false, Full: true, Available: true),
+        (Id: "exceeded", Label: "range exceeded", Floor: 193, Kills: 13, Here: KnownState.Off, Next: KnownState.Off, Open: false, Full: true, Available: true),
+        (Id: "paused", Label: "tracking paused", Floor: 193, Kills: 0, Here: KnownState.Off, Next: KnownState.Off, Open: false, Full: false, Available: false),
+        (Id: "boss", Label: "boss floor", Floor: 190, Kills: 0, Here: KnownState.Off, Next: KnownState.Off, Open: false, Full: true, Available: true),
+        (Id: "complete", Label: "floor 200", Floor: 200, Kills: 0, Here: KnownState.Off, Next: KnownState.Off, Open: true, Full: true, Available: true),
     }.Select(s => new
     {
         id = s.Id, label = s.Label, floor = s.Floor, kills = s.Kills,
@@ -145,6 +187,9 @@ if (args.Length == 2 && args[0] == "--export-preview")
         kind = PassageEstimator.Estimate(s.Floor, s.Kills, s.Here, s.Open, s.Full).Kind.ToString(),
         normal = FloorRules.NormalRange(s.Floor)?.ToString(),
         flight = FloorRules.NormalRange(s.Floor)?.WithFlight().ToString(),
+        hereLabel = CounterPresentation.FlightLabel(s.Here),
+        nextLabel = CounterPresentation.FlightLabel(s.Next, true),
+        view = CounterPresentation.Create(s.Floor, s.Kills, s.Here, s.Open, s.Full, s.Available),
     });
     File.WriteAllText(args[1], System.Text.Json.JsonSerializer.Serialize(scenes));
 }
