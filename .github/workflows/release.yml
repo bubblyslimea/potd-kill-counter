@@ -1,0 +1,73 @@
+name: check and release the counter
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: counter-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      DALAMUD_HOME: ${{ github.workspace }}/.tool-cache/dalamud
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: check out the source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: install the matching SDK
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: 10.0.403
+      - name: get official Dalamud references
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $archive = Join-Path $env:RUNNER_TEMP 'dalamud.zip'
+          Invoke-WebRequest 'https://goatcorp.github.io/dalamud-distrib/latest.zip' -OutFile $archive
+          Expand-Archive $archive -DestinationPath $env:DALAMUD_HOME -Force
+          if (-not (Test-Path (Join-Path $env:DALAMUD_HOME 'Dalamud.dll'))) { throw 'missing Dalamud references' }
+      - name: check floor and Flight behavior
+        run: dotnet run --project tests/PotdCounter.Tests -c Release
+      - name: restore locked dependencies
+        run: dotnet restore src/PotdCounter/PotdCounter.csproj --locked-mode
+      - name: compile the plugin
+        run: dotnet build src/PotdCounter/PotdCounter.csproj -c Release --no-restore
+      - name: package the alpha
+        run: python scripts/package.py
+      - name: publish the checked alpha
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = Get-Content distribution/release.json -Raw | ConvertFrom-Json
+          $tag = $release.tag
+          $existing = gh release view $tag --repo $env:GITHUB_REPOSITORY --json tagName 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            $compare = Join-Path $env:RUNNER_TEMP 'counter-existing-release'
+            New-Item $compare -ItemType Directory -Force | Out-Null
+            gh release download $tag --repo $env:GITHUB_REPOSITORY --dir $compare --pattern 'PotdCounter.zip'
+            if ($LASTEXITCODE -ne 0) { throw 'existing release could not be verified' }
+            $actual = (Get-FileHash (Join-Path $compare 'PotdCounter.zip') -Algorithm SHA256).Hash
+            $expected = (Get-FileHash artifacts/PotdCounter.zip -Algorithm SHA256).Hash
+            if ($actual -cne $expected) { throw 'this version already exists with different files, increase the version' }
+            Write-Host 'the identical alpha is already published'
+          } else {
+            gh release create $tag artifacts/PotdCounter.zip artifacts/PotdCounter.zip.sha256 artifacts/repo.json artifacts/release-record.json --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --title "Riri's PotD Counter $tag" --notes-file RELEASE_NOTES.md
+            if ($LASTEXITCODE -ne 0) { throw 'release publication failed' }
+          }

@@ -1,0 +1,162 @@
+[
+  {
+    "start": 1,
+    "end": 9,
+    "min": 3,
+    "max": 7,
+    "label": "3-7",
+    "url": "https://www.ddcompendium.com/potd_floorsets/001.html"
+  },
+  {
+    "start": 11,
+    "end": 19,
+    "min": 3,
+    "max": 7,
+    "label": "3-7",
+    "url": "https://www.ddcompendium.com/potd_floorsets/011.html"
+  },
+  {
+    "start": 21,
+    "end": 29,
+    "min": 3,
+    "max": 7,
+    "label": "3-7",
+    "url": "https://www.ddcompendium.com/potd_floorsets/021.html"
+  },
+  {
+    "start": 31,
+    "end": 39,
+    "min": 3,
+    "max": 7,
+    "label": "3-7",
+    "url": "https://www.ddcompendium.com/potd_floorsets/031.html"
+  },
+  {
+    "start": 41,
+    "end": 49,
+    "min": 3,
+    "max": 9,
+    "label": "4-8 (rarely 3 or 9)",
+    "url": "https://www.ddcompendium.com/potd_floorsets/041.html"
+  },
+  {
+    "start": 51,
+    "end": 59,
+    "min": 3,
+    "max": 7,
+    "label": "3-7",
+    "url": "https://www.ddcompendium.com/potd_floorsets/051.html"
+  },
+  {
+    "start": 61,
+    "end": 69,
+    "min": 3,
+    "max": 7,
+    "label": "3-7",
+    "url": "https://www.ddcompendium.com/potd_floorsets/061.html"
+  },
+  {
+    "start": 71,
+    "end": 79,
+    "min": 3,
+    "max": 7,
+    "label": "3-7",
+    "url": "https://www.ddcompendium.com/potd_floorsets/071.html"
+  },
+  {
+    "start": 81,
+    "end": 89,
+    "min": 3,
+    "max": 7,
+    "label": "3-7",
+    "url": "https://www.ddcompendium.com/potd_floorsets/081.html"
+  },
+  {
+    "start": 91,
+    "end": 99,
+    "min": 3,
+    "max": 9,
+    "label": "4-8 (rarely 3 or 9)",
+    "url": "https://www.ddcompendium.com/potd_floorsets/091.html"
+  },
+  {
+    "start": 101,
+    "end": 109,
+    "min": 4,
+    "max": 10,
+    "label": "4-9 (rarely 10)",
+    "url": "https://www.ddcompendium.com/potd_floorsets/101.html"
+  },
+  {
+    "start": 111,
+    "end": 119,
+    "min": 4,
+    "max": 10,
+    "label": "4-9 (rarely 10)",
+    "url": "https://www.ddcompendium.com/potd_floorsets/111.html"
+  },
+  {
+    "start": 121,
+    "end": 129,
+    "min": 4,
+    "max": 10,
+    "label": "4-9 (rarely 10)",
+    "url": "https://www.ddcompendium.com/potd_floorsets/121.html"
+  },
+  {
+    "start": 131,
+    "end": 139,
+    "min": 4,
+    "max": 10,
+    "label": "4-9 (rarely 10)",
+    "url": "https://www.ddcompendium.com/potd_floorsets/131.html"
+  },
+  {
+    "start": 141,
+    "end": 149,
+    "min": 4,
+    "max": 10,
+    "label": "4-9 (rarely 10)",
+    "url": "https://www.ddcompendium.com/potd_floorsets/141.html"
+  },
+  {
+    "start": 151,
+    "end": 159,
+    "min": 4,
+    "max": 10,
+    "label": "4-10",
+    "url": "https://www.ddcompendium.com/potd_floorsets/151.html"
+  },
+  {
+    "start": 161,
+    "end": 169,
+    "min": 4,
+    "max": 10,
+    "label": "4-10",
+    "url": "https://www.ddcompendium.com/potd_floorsets/161.html"
+  },
+  {
+    "start": 171,
+    "end": 179,
+    "min": 4,
+    "max": 10,
+    "label": "4-10",
+    "url": "https://www.ddcompendium.com/potd_floorsets/171.html"
+  },
+  {
+    "start": 181,
+    "end": 189,
+    "min": 4,
+    "max": 10,
+    "label": "4-10",
+    "url": "https://www.ddcompendium.com/potd_floorsets/181.html"
+  },
+  {
+    "start": 191,
+    "end": 199,
+    "min": 5,
+    "max": 13,
+    "label": "5-13",
+    "url": "https://www.ddcompendium.com/potd_floorsets/191.html"
+  }
+]
