@@ -53,6 +53,32 @@ public static class FloorRules
         _ => null,
     };
 
+
+    // Base IDs verified against the per-floor encounter sources linked in FLOOR_RANGES.md.
+    public static uint? BossBaseId(int floor) => floor switch
+    {
+        10 => 0x1692,
+        20 => 0x169F,
+        30 => 0x16AC,
+        40 => 0x16B9,
+        50 => 0x16C6,
+        60 => 0x1814,
+        70 => 0x1815,
+        80 => 0x1816,
+        90 => 0x1817,
+        100 => 0x1808,
+        110 => 0x1818,
+        120 => 0x1819,
+        130 => 0x181A,
+        140 => 0x181B,
+        150 => 0x181C,
+        160 => 0x181D,
+        170 => 0x181E,
+        180 => 0x181F,
+        190 => 0x1820,
+        _ => null,
+    };
+
     public static KillRange? UsualRange(int floor) =>
         Kind(floor) == FloorKind.Normal ? Ranges[(floor - 1) / 10] : null;
 

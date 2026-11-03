@@ -1,5 +1,15 @@
 # little changes
 
+## 0.1.5.0 · a moment for the victory
+
+- the defeated boss’s name becomes the headline, with **DEFEATED** and a green check beneath it
+- confirmed victories appear after combat ends, fade in gently and stay for four seconds
+- confirmed passage status remains visible, then OPEN returns after the victory moment
+- a reset, wipe, add death or duplicate event cannot start or replay the card
+- long names use two lines and fitted, baked fonts
+- tracker wording stays neutral, the completion card now says **floor 200 complete**
+- preview includes victory, a two-line name, pending passage and the post-victory state
+
 ## 0.1.4.0 · a little hello before the boss
 
 - each boss floor shows its name directly below **BOSS**

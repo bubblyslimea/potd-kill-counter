@@ -70,3 +70,30 @@ floor 200 has no boss entry
 | 170 | Yulunggu | [Floor guide](https://www.ddcompendium.com/potd_floorsets/161.html) |
 | 180 | Dendainsonne | [Floor guide](https://www.ddcompendium.com/potd_floorsets/171.html) |
 | 190 | The Godfather | [Floor guide](https://www.ddcompendium.com/potd_floorsets/181.html) |
+
+## boss defeat identity
+
+base IDs were checked against the linked encounter implementations on 2026-11-03
+these identify the boss independently of the client's display language, death events from adds or unknown actors cannot trigger the victory card
+
+| Floor | Base ID | Source |
+| --- | --- | --- |
+| 10 | `0x1692` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D10PalaceDeathgaze.cs) |
+| 20 | `0x169F` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D20Spurge.cs) |
+| 30 | `0x16AC` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D30Ningishzida.cs) |
+| 40 | `0x16B9` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D40Ixtab.cs) |
+| 50 | `0x16C6` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D50EddaBlackbosom.cs) |
+| 60 | `0x1814` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D60TheBlackRider.cs) |
+| 70 | `0x1815` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D70Yaquaru.cs) |
+| 80 | `0x1816` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D80Gudanna.cs) |
+| 90 | `0x1817` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D90TheGodmother.cs) |
+| 100 | `0x1808` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D100NybethObdilord.cs) |
+| 110 | `0x1818` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D110Alicanto.cs) |
+| 120 | `0x1819` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D120Kirtimukha.cs) |
+| 130 | `0x181A` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D130Alfard.cs) |
+| 140 | `0x181B` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D140AhPuch.cs) |
+| 150 | `0x181C` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D150Tisiphone.cs) |
+| 160 | `0x181D` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D160Todesritter.cs) |
+| 170 | `0x181E` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D170Yulunggu.cs) |
+| 180 | `0x181F` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D180Dendainsonne.cs) |
+| 190 | `0x1820` | [Encounter source](https://github.com/awgil/ffxiv_bossmod/blob/3bbbdf5e0ba0b1f201c5f76465df63ba63dc96c4/BossMod.Modules/Heavensward/DeepDungeon/PalaceOfTheDead/D190TheGodfather.cs) |

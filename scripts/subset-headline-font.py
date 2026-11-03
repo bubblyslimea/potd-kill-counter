@@ -14,7 +14,7 @@ options.name_IDs = [0, 1, 2, 3, 4, 5, 6, 13, 14]
 options.name_legacy = True
 options.name_languages = [0x409]
 builder = subset.Subsetter(options=options)
-builder.populate(text=" 0123456789~–?OPENBOSSCLEARCHECKWAIT")
+builder.populate(text=" 0123456789~–?ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 builder.subset(font)
 names = {1: "Riri Counter Headline", 2: "Bold", 3: "RiriCounterHeadline-Bold-1",
          4: "Riri Counter Headline Bold", 6: "RiriCounterHeadline-Bold"}

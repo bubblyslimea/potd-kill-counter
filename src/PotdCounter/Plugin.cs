@@ -35,6 +35,7 @@ public sealed class Plugin : IDalamudPlugin
     private bool readErrorLogged;
 
     internal FloorTracker Tracker { get; } = new();
+    private readonly BossVictory victory = new();
     internal Configuration Config { get; }
     internal bool Preview { get; private set; }
     internal PreviewState PreviewData { get; } = new();
@@ -45,7 +46,8 @@ public sealed class Plugin : IDalamudPlugin
     internal bool IsSimulated => !Tracker.Visible && Preview && CanPreview;
     internal CounterDisplay Display => IsSimulated ? PreviewData.Snapshot : new(
         Tracker.Visible ? Tracker.Floor : 0, Tracker.Kills, Tracker.FlightHere, Tracker.FlightNext,
-        Tracker.PassageOpen, Tracker.CountComplete, CounterAvailable, Condition[ConditionFlag.InCombat]);
+        Tracker.PassageOpen, Tracker.CountComplete, CounterAvailable, Condition[ConditionFlag.InCombat],
+        victory.Defeated, victory.Celebrating(Environment.TickCount64), victory.Opacity(Environment.TickCount64));
 
     public Plugin()
     {
@@ -95,6 +97,7 @@ public sealed class Plugin : IDalamudPlugin
             if (state == ReadState.Ready)
             {
                 Tracker.Apply(snapshot, now, now <= freshEntranceUntil);
+                victory.Follow(snapshot.InstanceKey, snapshot.Floor);
                 freshEntranceUntil = 0;
                 while (deaths.TryRead(out var message))
                 {
@@ -103,14 +106,19 @@ public sealed class Plugin : IDalamudPlugin
                     if (message.Unclassified)
                         Tracker.MarkIncomplete("an unidentified death was received, a kill may be missing");
                     else
+                    {
                         Tracker.Observe(message.Death);
+                        victory.Observe(message.Death);
+                    }
                 }
+                victory.Advance(Condition[ConditionFlag.InCombat], now);
                 if (!CounterAvailable)
                     Tracker.MarkIncomplete("kill tracking is unavailable, remaining estimate paused");
             }
             else if (state == ReadState.Outside)
             {
                 Tracker.Leave();
+                victory.Reset();
                 deaths.Clear();
             }
             else
@@ -134,6 +142,7 @@ public sealed class Plugin : IDalamudPlugin
     private void OnDutyStarted(IDutyStateEventArgs _)
     {
         Tracker.Leave();
+        victory.Reset();
         deaths.Clear();
         freshEntranceUntil = Environment.TickCount64 + 10000;
         nextRead = 0;
@@ -144,6 +153,7 @@ public sealed class Plugin : IDalamudPlugin
         deaths.SetEnabled(false);
         deaths.Clear();
         Tracker.Leave();
+        victory.Reset();
         freshEntranceUntil = 0;
     }
 

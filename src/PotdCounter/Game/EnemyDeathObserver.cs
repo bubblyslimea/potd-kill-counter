@@ -70,14 +70,14 @@ internal sealed unsafe class EnemyDeathObserver : IDisposable
         try
         {
             if (category == 6 && !isRecorded && reader.Read(out var floor) == ReadState.Ready &&
-                FloorRules.Kind(floor.Floor) == FloorKind.Normal)
+                FloorRules.Kind(floor.Floor) is FloorKind.Normal or FloorKind.Boss)
             {
                 var actor = objects.SearchByEntityId(entityId);
                 var enemy = actor is IBattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Combatant;
                 if (enemy || actor == null)
                 {
                     if (queue.Count < 1024)
-                        queue.Enqueue(new(new(floor.InstanceKey, floor.Floor, entityId, enemy), actor == null));
+                        queue.Enqueue(new(new(floor.InstanceKey, floor.Floor, entityId, enemy, actor?.BaseId ?? 0), actor == null));
                     else
                         Interlocked.Exchange(ref observerFault, 1);
                 }

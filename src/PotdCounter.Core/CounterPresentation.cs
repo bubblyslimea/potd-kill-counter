@@ -8,10 +8,11 @@ public readonly record struct FlightBadge(string Status, string Detail, CounterT
 public readonly record struct CounterPresentation(
     string Main, string Caption, string? Observed, string? Range, string Note,
     CounterTone Tone, bool IsEstimate, bool ShowFlight, FlightBadge Flight,
-    string? NextFlightNotice, CounterTone NextFlightTone, string? DestinationNotice)
+    string? NextFlightNotice, CounterTone NextFlightTone, string? DestinationNotice, bool IsBossVictory = false)
 {
     public static CounterPresentation Create(int floor, int kills, KnownState here,
-        bool passageOpen, bool countComplete, bool counterAvailable = true, KnownState next = KnownState.Unknown)
+        bool passageOpen, bool countComplete, bool counterAvailable = true, KnownState next = KnownState.Unknown,
+        bool bossDefeated = false, bool celebrateVictory = false)
     {
         var estimate = PassageEstimator.Estimate(floor, kills, here, passageOpen, countComplete);
         var normalFloor = FloorRules.Kind(floor) == FloorKind.Normal;
@@ -47,6 +48,11 @@ public readonly record struct CounterPresentation(
         var destination = showFlight && FloorRules.Kind(floor + 1) == FloorKind.Boss
             ? "BOSS NEXT FLOOR" : floor == 199 ? "FINAL FLOOR NEXT" : null;
 
+        if (bossDefeated && FloorRules.BossName(floor) is { } bossName && (celebrateVictory || !passageOpen))
+            return new(BossHeadline(bossName), "DEFEATED", null, null, "Boss defeat confirmed",
+                CounterTone.Ready, false, false, badge, null, CounterTone.Future,
+                passageOpen ? "Passage open" : null, true);
+
         CounterPresentation Present(string main, string caption, string note, CounterTone tone, bool isEstimate = false,
             bool includeObserved = true) => new(main, caption, includeObserved ? observed : null, range, note,
                 tone, isEstimate, showFlight, badge, nextNotice, nextTone, destination);
@@ -74,12 +80,23 @@ public readonly record struct CounterPresentation(
                 CounterTone.Attention),
             EstimateKind.Boss => ("BOSS", FloorRules.BossName(floor) ?? "boss floor",
                 "the normal monster ranges do not apply on boss floors", CounterTone.Neutral),
-            EstimateKind.Complete => ("CLEAR", "you made it !!",
+            EstimateKind.Complete => ("CLEAR", "floor 200 complete",
                 "floor 200 is the completion floor", CounterTone.Ready),
             _ => ("WAIT", "waiting for PotD",
                 "the live counter follows Palace of the Dead", CounterTone.Neutral),
         };
         return Present(main, caption, note, tone, estimate.Remaining is not null);
+    }
+
+    private static string BossHeadline(string name)
+    {
+        var title = name.ToUpperInvariant();
+        if (title.Length <= 10) return title;
+        var split = -1;
+        for (var i = 0; i < title.Length; i++)
+            if (title[i] == ' ' && (split < 0 || Math.Abs(2 * i - title.Length) < Math.Abs(2 * split - title.Length)))
+                split = i;
+        return split < 0 ? title : title[..split] + "\n" + title[(split + 1)..];
     }
 
     public static string FlightLabel(KnownState value, bool nextFloor = false) => value switch

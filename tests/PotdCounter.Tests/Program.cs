@@ -221,7 +221,8 @@ Check(view.Flight.Tone == CounterTone.Active && view.NextFlightTone == CounterTo
 foreach (var example in CounterExamples.All)
 {
     view = example.State.Presentation;
-    Check(view.Main.Length <= 5, "headline stays glanceable");
+    Check(view.IsBossVictory ? view.Main.Split('\n').Length <= 2 : view.Main.Length <= 5,
+        "counts stay glanceable and victory names use at most two lines");
     Check(view.Caption.Length <= 24, "visible caveat fits the caption band");
     Check(!view.IsEstimate || view.Main.StartsWith('~'), "numeric estimates always approximate");
 }
@@ -301,7 +302,84 @@ foreach (var floor in new[] { 1, 9, 11, 179, 181, 193, 199, 200 })
     Check(!(duringBoss with { Floor = floor }).HideForBossCombat,
         "ordinary combat and completion never trigger boss-only hiding");
 
-Console.WriteLine($"PASS: {checks} assertions; all 200 floors, Flight, deaths, transitions, uncertainty, passage priority and presentation.");
+// Only the expected boss's actual death can confirm a victory, independent of combat ending.
+Check(FloorRules.BossBaseId(10) == 0x1692 && FloorRules.BossBaseId(50) == 0x16C6 &&
+      FloorRules.BossBaseId(180) == 0x181F && FloorRules.BossBaseId(190) == 0x1820,
+    "verified early, story and deep boss IDs");
+Check(Enumerable.Range(1, 200).Where(f => FloorRules.BossBaseId(f) is not null).SequenceEqual(namedBosses),
+    "boss identity and name tables cover the same 19 floors");
+var victory = new BossVictory();
+victory.Follow(1, 180);
+var bossDeath = new EnemyDeath(1, 180, 400, true, 0x181F);
+victory.Advance(true, 0);
+victory.Advance(false, 1000);
+Check(!victory.Defeated && !victory.Celebrating(1000), "combat ending or a wipe is not a victory");
+foreach (var invalid in new[]
+{
+    bossDeath with { BaseId = 0 }, bossDeath with { BaseId = 0x1820 },
+    bossDeath with { IsEnemy = false }, bossDeath with { EntityId = 0 },
+    bossDeath with { EntityId = 0xE0000000 }, bossDeath with { Floor = 170 },
+    bossDeath with { InstanceKey = 2 },
+})
+    Check(!victory.Observe(invalid) && !victory.Defeated,
+        "unknown actor, add, player, sentinel, old floor or other instance cannot announce victory");
+Check(victory.Observe(bossDeath), "expected boss death confirms the victory");
+victory.Advance(true, 2000);
+victory.Advance(true, 12000);
+Check(victory.Defeated && victory.Celebrating(12000) && victory.Opacity(12000) == 0,
+    "confirmed death waits for combat to end without spending the display timer");
+var victoryDisplay = beforeBoss with { BossDefeated = victory.Defeated, CelebrateVictory = true, InCombat = true, Open = true };
+Check(victoryDisplay.HideForBossCombat, "victory cannot interrupt boss combat");
+victory.Advance(false, 13000);
+Check(victory.Opacity(13000) == 0 && victory.Opacity(13090) == 0.5f && victory.Opacity(13180) == 1,
+    "victory fades in over 180 ms using the monotonic timer");
+Check(victory.Celebrating(16999) && !victory.Celebrating(17000), "four-second display boundary");
+Check(!victory.Observe(bossDeath), "duplicate boss death does not restart the victory");
+victory.Advance(false, 18000);
+victory.Follow(1, 180);
+Check(!victory.Celebrating(18000) && victory.Defeated && victory.Opacity(18000) == 1,
+    "repeated reads, opening settings or a hidden overlay do not restart the timer");
+victoryDisplay = victoryDisplay with { InCombat = false, CelebrateVictory = victory.Celebrating(18000) };
+Check(victoryDisplay.Presentation.Main == "OPEN" && !victoryDisplay.Presentation.IsBossVictory,
+    "after the celebration the confirmed passage state returns");
+view = (victoryDisplay with { Open = false }).Presentation;
+Check(view.IsBossVictory && view.Caption == "DEFEATED" && view.DestinationNotice is null,
+    "delayed passage data retains the known defeat without inventing an open signal");
+view = (victoryDisplay with { CelebrateVictory = true, Available = false }).Presentation;
+Check(view.Main == "DENDAINSONNE" && view.Caption == "DEFEATED" && view.DestinationNotice == "Passage open" &&
+      !view.ShowFlight && view.Range is null && view.Observed is null && view.Tone == CounterTone.Ready,
+    "boss name leads the neutral victory card, confirmed passage remains visible");
+foreach (var floor in namedBosses)
+{
+    victory.Follow(1, floor);
+    Check(victory.Observe(new(1, floor, 401, true, FloorRules.BossBaseId(floor)!.Value)),
+        "each of the 19 expected bosses confirms its own victory");
+    view = CounterPresentation.Create(floor, 0, KnownState.Off, true, true, bossDefeated: true, celebrateVictory: true);
+    Check(view.Main.Replace('\n', ' ') == FloorRules.BossName(floor)!.ToUpperInvariant() &&
+          view.IsBossVictory && view.Main.Split('\n').Length <= 2,
+        "victory headline preserves every complete boss name");
+}
+victory.Follow(2, 190);
+Check(!victory.Defeated && !victory.Celebrating(20000), "new instance resets a same-numbered floor victory");
+victory.Observe(new(2, 190, 402, true, 0x1820));
+victory.Follow(2, 191);
+Check(!victory.Defeated && !victory.Observe(new(2, 191, 403, true, 0x1820)),
+    "ordinary floor clears the victory and cannot confirm one");
+victory.Follow(2, 180);
+victory.Observe(new(2, 180, 404, true, 0x181F));
+victory.Reset();
+Check(!victory.Defeated && !victory.Observe(bossDeath), "leaving or logout clears the identity and victory latch");
+var reloaded = new BossVictory();
+reloaded.Follow(1, 180);
+reloaded.Advance(false, 30000);
+Check(!reloaded.Defeated, "loading on an already-cleared floor cannot replay a victory");
+foreach (var floor in new[] { 0, 1, 9, 181, 193, 200, 201 })
+{
+    view = CounterPresentation.Create(floor, 0, KnownState.Off, true, true, bossDefeated: true, celebrateVictory: true);
+    Check(!view.IsBossVictory, "a stray victory flag cannot affect ordinary, completion or invalid floors");
+}
+
+Console.WriteLine($"PASS: {checks} assertions; all 200 floors, Flight, deaths, transitions, uncertainty, passage priority, boss victory and presentation.");
 
 // Shared examples drive native preview controls and the external labelled studies.
 if (args.Length == 2 && args[0] == "--export-preview")
@@ -312,4 +390,7 @@ if (args.Length == 2 && args[0] == "--export-preview")
         view = s.State.Presentation,
     });
     File.WriteAllText(args[1], System.Text.Json.JsonSerializer.Serialize(scenes));
+    var bossTitles = namedBosses.Select(f => CounterPresentation.Create(f, 0, KnownState.Off, true, true,
+        bossDefeated: true, celebrateVictory: true).Main);
+    File.WriteAllText(Path.ChangeExtension(args[1], ".bosses.json"), System.Text.Json.JsonSerializer.Serialize(bossTitles));
 }

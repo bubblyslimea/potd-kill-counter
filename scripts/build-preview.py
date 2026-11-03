@@ -17,6 +17,25 @@ cmap = font.getBestCmap()
 glyphs = font.getGlyphSet()
 font_scale = 80 / (font["hhea"].ascent - font["hhea"].descent)
 font_css_size = font_scale * font["head"].unitsPerEm
+def victory_size(value):
+    lines = value.split("\n")
+    if len(lines) > 2:
+        raise ValueError("victory name needs too many lines")
+    for size in (48, 40, 34):
+        scale = font_scale * size / 80
+        if all(sum(font["hmtx"][cmap[ord(c)]][0] for c in line) * scale <= 280 for line in lines):
+            return size
+    raise ValueError("victory name exceeds HUD safe width: " + value)
+
+boss_titles = json.loads(Path(sys.argv[1]).with_suffix(".bosses.json").read_text())
+assert len(boss_titles) == 19
+for title in boss_titles:
+    victory_size(title)
+for scene in scenes:
+    if scene["view"]["IsBossVictory"]:
+        scene["victorySize"] = victory_size(scene["view"]["Main"])
+        scene["victoryCssSize"] = font_css_size * scene["victorySize"] / 80
+
 colors = ["#f7f7fc", "#66fab0", "#ffcf4a", "#e0b8ff", "#66d6ff"]
 fills = {0: "#2b3038", 2: "#45381f", 3: "#3b2154"}
 
@@ -30,6 +49,7 @@ template = """<!doctype html>
 .eyebrow{color:#e0b8ff;font-size:13px}h1{font-size:34px;letter-spacing:-.04em;margin:12px 0}
 p{color:#b9bdc7;line-height:1.6;font-size:14px}.stage{display:grid;place-items:center;min-height:310px;margin:24px 0;background:#22262c;border:1px solid #3c4149;border-radius:20px}
 .hud{position:relative;width:320px;height:232px;background:#0e1112;border:1px solid #424a4f;border-radius:18px;flex:none}
+.hud.victory .answer{top:39px;height:96px}.hud.victory .headline{white-space:pre;text-align:center}.hud.victory .caption{top:145px;display:flex;align-items:center;justify-content:center}.defeat-check{width:20px;height:20px;margin-left:10px;stroke:#66fab0;stroke-width:3;fill:none;overflow:visible}
 .hud.ready{border:2px solid #66fab0}.floor{position:absolute;left:17px;top:11px;font-size:18px}
 .answer{position:absolute;top:31px;left:0;width:100%;height:80px;display:flex;justify-content:center;align-items:center}
 .headline{font:700 FONT_SIZEpx/80px CounterHeadline, sans-serif;white-space:nowrap}
@@ -42,13 +62,13 @@ p{color:#b9bdc7;line-height:1.6;font-size:14px}.stage{display:grid;place-items:c
 details{margin-top:24px}summary{cursor:pointer;color:#e0b8ff}.foot{font-size:12px}[hidden]{display:none!important}
 @media(max-width:360px){body{padding:24px 8px}.stage{margin-left:-8px;margin-right:-8px}}
 </style>
-<main><div class="eyebrow">Riri's PotD Counter · 0.1.4</div><h1>read the state, keep moving</h1>
+<main><div class="eyebrow">Riri's PotD Counter · 0.1.5</div><h1>read the state, keep moving</h1>
 <p>the count up front, Flight where you expect it, details in /potd when you need them</p>
 <p class="foot">layout study · simulated values · not an in-game capture</p>
 <section class="stage" aria-label="Simulated HUD"><div class="hud" id="hud">
 <div class="floor" id="floor"></div>
 <div class="answer"><span class="headline" id="headline"></span><svg class="check" id="check" viewBox="0 0 29 29" aria-hidden="true"><path d="M0 15L9 24L29 1"/></svg></div>
-<div class="caption" id="caption"></div>
+<div class="caption" id="caption"><span id="caption-text"></span><svg class="defeat-check" id="defeat-check" viewBox="0 0 20 20" aria-hidden="true" hidden><path d="M0 12L6 18L20 2"/></svg></div>
 <div class="badge" id="badge"><span class="status" id="status"></span><span class="detail" id="detail"></span></div>
 <div class="notice" id="next"></div><div class="notice" id="destination"></div>
 </div><p id="combat-hidden" hidden>boss combat · HUD hidden</p></section><nav class="controls" id="controls" aria-label="Example states"></nav>
@@ -61,15 +81,18 @@ function show(s){
  const v=s.view,b=v.Flight;
  $('hud').hidden=s.hidden;$('combat-hidden').hidden=!s.hidden;
  $('floor').textContent='floor '+s.floor;
- $('headline').textContent=v.Main;$('headline').style.color=colors[v.Tone];
+ $('hud').classList.toggle('victory',v.IsBossVictory);
+ $('headline').textContent=v.Main;$('headline').style.color=colors[v.IsBossVictory?0:v.Tone];
+ $('headline').style.fontSize=(v.IsBossVictory?s.victoryCssSize:FONT_SIZE)+'px';
+ $('headline').style.lineHeight=(v.IsBossVictory?s.victorySize:80)+'px';
  $('check').toggleAttribute('hidden',v.Main!=='OPEN');$('hud').classList.toggle('ready',v.Tone===1);
- $('caption').textContent=v.Caption;$('caption').style.fontSize=v.Caption.length>22?'16px':'20px';
+ $('caption-text').textContent=v.Caption;$('caption').style.color=colors[v.IsBossVictory?1:0];$('defeat-check').hidden=!v.IsBossVictory;$('caption').style.fontSize=v.Caption.length>22?'16px':'20px';
  $('badge').hidden=!v.ShowFlight;$('badge').classList.toggle('first',b.TwoLines);
  $('badge').style.color=colors[b.Tone];$('badge').style.background=fills[b.Tone]||fills[0];
  $('status').textContent=b.Status;$('detail').textContent=b.Detail;
  $('next').textContent=v.NextFlightNotice||'';$('next').style.color=colors[v.NextFlightTone];
- $('destination').textContent=v.DestinationNotice||'';$('destination').style.color=colors[2];
- $('destination').style.top=v.NextFlightNotice?'206px':'186px';
+ $('destination').textContent=v.DestinationNotice||'';$('destination').style.color=colors[v.IsBossVictory?1:2];
+ $('destination').style.top=v.IsBossVictory?'193px':v.NextFlightNotice?'206px':'186px';
  $('observed').textContent=v.Observed||'';$('range').textContent=v.Range||'';$('note').textContent=v.Note;
  document.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===s.id)));
 }
@@ -78,7 +101,7 @@ show(scenes[0]);
 </script></html>
 """
 for key, value in {
-    "FONT_BASE64": base64.b64encode((root / "assets/CounterHeadline.ttf").read_bytes()).decode(),
+    "FONT_BASE64": "".join(f"%{byte:02X}" for byte in base64.b64encode((root / "assets/CounterHeadline.ttf").read_bytes())),
     "FONT_SIZE": str(font_css_size),
     "SCENES_JSON": json.dumps(scenes, ensure_ascii=False),
     "COLORS_JSON": json.dumps(colors),
@@ -91,10 +114,11 @@ def text(x, y, value, size=16, color="#b9bdc7", center=False):
     align = ' text-anchor="middle"' if center else ""
     return f'<text x="{x}" y="{y}" fill="{color}" font-size="{size}"{align}>{html.escape(value)}</text>'
 
-def headline(value, color):
+def headline(value, color, size=80, baseline=96):
     # ImGui advances glyphs without font kerning; match that in the outlined preview.
     advances = [font["hmtx"][cmap[ord(c)]][0] for c in value]
-    width = sum(advances) * font_scale
+    scale = font_scale * size / 80
+    width = sum(advances) * scale
     extra = 42 if value == "OPEN" else 0
     if width + extra > 288:
         raise ValueError("headline exceeds HUD safe width: " + value)
@@ -103,22 +127,23 @@ def headline(value, color):
     for ch, advance in zip(value, advances):
         pen = SVGPathPen(glyphs)
         glyphs[cmap[ord(ch)]].draw(pen)
-        parts.append(f'<path d="{pen.getCommands()}" fill="{color}" transform="translate({x:.3f} 96) scale({font_scale:.6f} {-font_scale:.6f})"/>')
-        x += advance * font_scale
+        parts.append(f'<path d="{pen.getCommands()}" fill="{color}" transform="translate({x:.3f} {baseline:.3f}) scale({scale:.6f} {-scale:.6f})"/>')
+        x += advance * scale
     if value == "OPEN":
         parts.append(f'<path d="M{x+13:.3f} 70l9 9l20 -23" stroke="{colors[1]}" stroke-width="5" fill="none"/>')
     return parts
 
 # Exercise every fixture's real headline, including states outside the six-card overview.
 for s in scenes:
-    headline(s["view"]["Main"], colors[s["view"]["Tone"]])
+    if not s["view"]["IsBossVictory"]:
+        headline(s["view"]["Main"], colors[s["view"]["Tone"]])
 
 parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="720" viewBox="0 0 1080 720">',
          '<rect width="1080" height="720" rx="18" fill="#16181d"/>',
          '<g font-family="DejaVu Sans,Arial,sans-serif">',
          text(36, 49, "Riri's PotD Counter", 28, "#f7f7fc"),
          text(36, 80, "read the state, keep moving", 17, "#e0b8ff")]
-for index, scene_id in enumerate(["first", "flight", "normal", "both", "boss-before", "open"]):
+for index, scene_id in enumerate(["first", "flight", "boss-before", "boss-victory", "boss-victory-long", "open"]):
     s = next(s for s in scenes if s["id"] == scene_id)
     v, x, y = s["view"], 36 + (index % 3) * 344, 128 + (index // 3) * 280
     b = v["Flight"]
@@ -126,24 +151,36 @@ for index, scene_id in enumerate(["first", "flight", "normal", "both", "boss-bef
               f'<g transform="translate({x} {y})">',
               f'<rect x="1" y="1" width="318" height="230" rx="18" fill="#0e1112" stroke="{colors[1] if v["Tone"] == 1 else "#424a4f"}" stroke-width="{2 if v["Tone"] == 1 else 1}"/>',
               text(18, 29, f'floor {s["floor"]}', 18, colors[0])]
-    parts += headline(v["Main"], colors[v["Tone"]])
-    parts += [text(160, 126, v["Caption"], 20, colors[0], True)]
-    bw = 230 if b["TwoLines"] else 218
-    parts += [f'<rect x="{160-bw/2}" y="140" width="{bw}" height="40" rx="20" fill="{fills.get(b["Tone"], fills[0])}" stroke="{colors[b["Tone"]]}" stroke-opacity=".35"/>']
-    if b["TwoLines"]:
-        parts += [text(160, 155, b["Status"], 16, colors[b["Tone"]], True),
-                  text(160, 174, b["Detail"], 18, colors[b["Tone"]], True)]
+    if v["IsBossVictory"]:
+        size = s["victorySize"]
+        lines = v["Main"].split("\n")
+        top = 40 + (96 - len(lines) * size) / 2
+        for n, line in enumerate(lines):
+            baseline = top + n * size + font["hhea"].ascent * font_scale * size / 80
+            parts += headline(line, colors[0], size, baseline)
+        parts += [text(145, 165, v["Caption"], 20, colors[1], True),
+                  '<path d="M205 158l6 6l14 -16" stroke="#66fab0" stroke-width="3" fill="none"/>']
+        if v["DestinationNotice"]:
+            parts += [text(160, 209, v["DestinationNotice"], 16, colors[1], True)]
     else:
-        parts += [text(160, 167, b["Status"]+"  "+b["Detail"], 18, colors[b["Tone"]], True)]
-    ny = 202
-    if v["NextFlightNotice"]:
-        parts += [text(160, ny, v["NextFlightNotice"], 16, colors[v["NextFlightTone"]], True)]
-        ny += 20
-    if v["DestinationNotice"]:
-        parts += [text(160, ny, v["DestinationNotice"], 16, colors[2], True)]
+        parts += headline(v["Main"], colors[v["Tone"]])
+        parts += [text(160, 126, v["Caption"], 20, colors[0], True)]
+        bw = 230 if b["TwoLines"] else 218
+        parts += [f'<rect x="{160-bw/2}" y="140" width="{bw}" height="40" rx="20" fill="{fills.get(b["Tone"], fills[0])}" stroke="{colors[b["Tone"]]}" stroke-opacity=".35"/>']
+        if b["TwoLines"]:
+            parts += [text(160, 155, b["Status"], 16, colors[b["Tone"]], True),
+                      text(160, 174, b["Detail"], 18, colors[b["Tone"]], True)]
+        else:
+            parts += [text(160, 167, b["Status"]+"  "+b["Detail"], 18, colors[b["Tone"]], True)]
+        ny = 202
+        if v["NextFlightNotice"]:
+            parts += [text(160, ny, v["NextFlightNotice"], 16, colors[v["NextFlightTone"]], True)]
+            ny += 20
+        if v["DestinationNotice"]:
+            parts += [text(160, ny, v["DestinationNotice"], 16, colors[2], True)]
     parts += ["</g>"]
 parts += [text(36, 681, "layout study · simulated values · not an in-game capture", 13),
           text(36, 704, "/potd opens settings · /potd preview tries these states in the native HUD", 13, "#e0b8ff"),
           "</g></svg>"]
 (root / "assets/counter-preview.svg").write_text("\n".join(parts)+"\n", encoding="utf-8")
-print(f"refreshed layout studies; {len(scenes)} real presentation states fit the headline band")
+print(f"refreshed layout studies; {len(scenes)} real presentation states and all 19 victory names fit their headline bands")

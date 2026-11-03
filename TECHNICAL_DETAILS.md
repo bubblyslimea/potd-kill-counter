@@ -2,9 +2,11 @@
 
 ## this build
 
-0.1.4.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
+0.1.5.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
 the release ZIP contains one plugin assembly, its manifest and dependency description, plus the license and acknowledgements
 Dalamud supplies the host assemblies, they are not included in the download
+
+the tracker UI uses neutral wording, Riri’s voice is reserved for GitHub and documentation
 
 the counter itself makes no network requests and sends no telemetry
 GitHub and the shared catalog are used by the installer for downloads and updates, counting runs locally
@@ -30,6 +32,8 @@ it only follows Palace of the Dead (`DeepDungeonId == 1`), and automatically hid
 each floor gets its own count and set of observed enemy IDs
 the observer uses the supported FFXIVClientStructs address for `PacketDispatcher.HandleActorControlPacket`, category 6 identifies a death
 known non-enemies and recorded events are excluded, the original callback runs once with unchanged arguments
+on boss floors the same observer captures the actor base ID before the game handler can remove it
+the separate victory tracker accepts only the expected boss for the current floor and instance, unknown identities cannot confirm a defeat
 managed observation errors are contained, a missing native address disables the observer
 
 there are no full object-table scans in the update loop, individual actors are looked up when death events arrive
@@ -77,12 +81,31 @@ the HUD hides while Dalamud reports `ConditionFlag.InCombat` on a boss floor
 this flag is read at draw time, independently of the 200 ms floor poll
 the same flag does not hide the HUD during ordinary-floor combat
 when combat ends, the HUD returns if the user's display preference still permits it
-the tracker keeps running while hidden, and the game-confirmed passage state retains priority
+the tracker keeps running while hidden, and the game-confirmed passage state remains available
 settings remain available through `/potd`, preview combat uses a separate pretend flag
 
 names are linked in [the floor reference](FLOOR_RANGES.md)
 the combat signal is the supported [Dalamud client condition](https://dalamud.dev/api/Dalamud.Game.ClientState.Conditions/Enums/ConditionFlag/)
 its timing in live solo and party boss fights remains an in-game verification item
+
+an observed death of the floor's expected boss latches a separate confirmed-victory state
+the ID mapping is linked in the floor reference and does not depend on the client's display language
+combat ending alone, adds, unidentified actors, old-floor messages and replay events cannot establish a victory
+there is no new native hook, object-table scan, runtime download or per-frame game action
+
+once combat ends, a monotonic four-second timer begins independently of whether the HUD is visible
+the card fades in over 180 ms, leads with the boss name, and shows DEFEATED with a green check beneath it
+confirmed passage activation is shown as a small status line during the victory
+when the four seconds expire, OPEN takes over if confirmed, otherwise the known defeat stays visible until passage data updates
+repeated events and opening settings cannot restart the timer
+instance or floor changes, duty start and logout reset the latch, loading an already-cleared floor does not replay it
+if a boss death is not observed or its identity is unavailable, normal boss/passage presentation remains in use
+
+multiword names use up to two balanced lines, fitted against baked 48, 40 and 34 px versions of the embedded headline font
+all 19 names are checked against the shipped font during preview generation
+preview presets hold the victory for inspection, they do not affect the live latch or timer
+the new native death-event classification and post-combat timing still need live solo and party verification
+
 
 ## make it comfortable
 
@@ -119,13 +142,13 @@ passing the estimated maximum shows `CHECK`, never a fabricated open passage
 settings put detailed counts, explanations and reader status behind separate expanders
 
 the managed font atlas bakes the headline at its actual size and rebuilds for Dalamud UI scaling
-the small embedded headline font is a renamed subset of DejaVu Sans Bold, supporting text uses the host's font assets
+the small embedded headline font is a renamed subset of DejaVu Sans Bold with the Latin capitals needed for boss names, supporting text uses the host's font assets
 there is no window-font enlargement, new runtime dependency or network request
 font handles are created once and disposed on unload
 the 320 × 232 logical-pixel card keeps the same layout across states, with an extra simulation banner above previews
 saved placement, lock and opacity are retained, new installations default to 96% opacity
 
-`PREVIEW.html` is an interactive layout study with the same 20 examples used by the native preview controls
+`PREVIEW.html` is an interactive layout study with the same 23 examples used by the native preview controls
 the README visual is also a labelled layout preview, neither is an in-game capture
 the native simulation command lets you inspect the actual overlay without entering PotD
 

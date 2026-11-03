@@ -3,7 +3,7 @@ namespace PotdCounter.Core;
 public readonly record struct FloorSnapshot(
     long InstanceKey, int Floor, byte PassageProgress, KnownState FlightQueued, int PartySize);
 
-public readonly record struct EnemyDeath(long InstanceKey, int Floor, uint EntityId, bool IsEnemy);
+public readonly record struct EnemyDeath(long InstanceKey, int Floor, uint EntityId, bool IsEnemy, uint BaseId = 0);
 
 /// <summary>Managed floor state. No native memory, UI, files or network access.</summary>
 public sealed class FloorTracker

@@ -74,6 +74,8 @@ internal sealed class SettingsWindow : Window
                 ImGui.Checkbox("partial count", ref p.Partial);
                 ImGui.Checkbox("kill tracking unavailable", ref p.Unavailable);
                 ImGui.Checkbox("in combat", ref p.InCombat);
+                ImGui.Checkbox("boss defeat confirmed", ref p.BossDefeated);
+                ImGui.Checkbox("show victory card", ref p.CelebrateVictory);
             }
             if (plugin.IsSimulated && p.Snapshot.HideForBossCombat)
                 ImGui.TextWrapped("boss combat · counter hidden\nchoose another example or turn off in combat to see it again");
@@ -84,7 +86,7 @@ internal sealed class SettingsWindow : Window
         if (ImGui.CollapsingHeader("about the count"))
         {
             ImGui.TextWrapped("the big number is a rough range of kills left\nthe game tells us when the passage opens");
-            ImGui.TextWrapped("boss floors show the boss name before the pull\nthe counter hides during boss combat and returns afterwards\nit stays visible during ordinary-floor fights");
+            ImGui.TextWrapped("Boss floors show the boss name before the pull\nThe counter hides during boss combat\nA confirmed boss defeat shows the name above DEFEATED for four seconds after combat ends\nThe passage status remains visible when confirmed\nOrdinary-floor fights keep the counter visible");
             ImGui.TextWrapped("Flight this floor is already helping you\nFlight next floor means a use is queued for the next floor");
             ImGui.TextWrapped("FIRST FLOOR: Flight Unavailable describes the incoming effect on floor 1, not your pomander inventory\nyou can still use a pomander there for the next floor");
             ImGui.TextWrapped("earlier or distant party kills may be missing if you join late or reconnect\na wider amber range keeps kills left visible, partial counts stay labelled\nunknown Flight includes both possible targets");

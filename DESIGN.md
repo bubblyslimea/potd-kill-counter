@@ -1,5 +1,23 @@
 # Riri's PotD Counter · Asura design
 
+## 0.1.5 confirmed boss victory
+
+after an observed boss defeat, make the boss's name the headline and show `DEFEATED` with a green check beneath it
+keep the tracker UI neutral, Riri's voice belongs in GitHub and documentation
+the existing card stays hidden during boss combat, then fades in over 180 ms and holds the victory for four seconds
+afterwards show OPEN when passage activation is confirmed, otherwise retain the confirmed defeat until the passage updates
+
+keep the existing C# / Dalamud stack, floor counts, Flight rules and 320 × 232 card
+extend the existing death observer with the actor's base ID, matched against the verified boss for this floor
+unknown actors, adds, wrong bosses, old floor events and recorded events cannot establish a victory
+a separate managed victory tracker owns the once-per-floor latch and monotonic timer, combat ending alone never confirms a defeat
+the timer starts after combat ends even when the user has hidden the overlay, reopening settings or the overlay cannot replay it
+reset the latch at an instance/floor change, duty start or logout, preview values remain separate from live state
+
+render long names on two balanced lines and select among baked 48, 40 and 34 px headline fonts so the name stays inside the card
+verify all 19 names against the actual font, exercise victory, reset, wipe, duplicates, hidden overlays and transitions, then compile against the host
+the native event path still requires an in-game check, ordinary-floor behavior remains the regression baseline
+
 ## 0.1.4 boss presentation
 
 name the boss before the pull and remove the combat HUD while the player fights it

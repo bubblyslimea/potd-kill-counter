@@ -10,6 +10,7 @@ keeps track of the kills you see, your Flight pomanders, and roughly how much mi
 when the passage opens, it lets you know
 
 boss floors show who you are about to face, then the HUD steps away while you fight
+a confirmed victory brings their name forward, with **DEFEATED** underneath
 
 no Flight required, the first floor still gets a kills-left estimate
 if earlier kills or Flight are uncertain, the range gets wider and stays labelled
@@ -28,8 +29,8 @@ open **run details** in `/potd` when you want the observed count and full floor 
 
 already using the Pages `/notation/repo.json` address? that row works too, you only need one
 
-the first alpha has a positive live PotD report, this update brings the approved glanceable HUD to the plugin
-the new layout is still in testing while it gets an in-game look
+the PotD tracker has a positive live report, this update adds a small victory moment
+the new boss-defeat transition is still in testing while it gets an in-game look
 
 ![the shared repository page with Notation and the counter](assets/shared-repository.jpg)
 
