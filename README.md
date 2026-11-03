@@ -18,7 +18,7 @@ if earlier kills or Flight are uncertain, the range gets wider and stays labelle
 ## come try it
 
 1. add the [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json) in `/xlsettings` → **Experimental → Custom Plugin Repositories** and save
-2. enable **Get plugin testing builds**, then find **Riri's PotD Counter** in `/xlplugins` and install
+2. find **Riri's PotD Counter** in `/xlplugins` and install
 3. open `/potd` to settle it into place, or `/potd preview` to try it outside PotD
 
 `/potdcount` still works too
@@ -30,7 +30,8 @@ open **run details** in `/potd` when you want the observed count and full floor 
 already using the Pages `/notation/repo.json` address? that row works too, you only need one
 
 the PotD tracker has a positive live report, this update adds a small victory moment
-the new boss-defeat transition is still in testing while it gets an in-game look
+version 0.1.5 is available on the stable channel, no testing setting is needed
+the new boss-defeat transition still needs its own in-game confirmation
 
 ![the shared repository page with Notation and the counter](assets/shared-repository.jpg)
 

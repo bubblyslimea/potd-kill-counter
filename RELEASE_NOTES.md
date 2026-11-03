@@ -1,21 +1,14 @@
-# a moment for the victory
+# ready for everyone
 
-the boss’s name gets the spotlight after a confirmed defeat
-**DEFEATED** and a green check sit underneath, with clear, neutral wording in the tracker
+0.1.5 is now available on the stable channel !!
 
-the HUD stays hidden while you fight
-once the expected boss’s death is observed and combat ends, the card fades in for a four-second victory moment
-confirmed passage status stays visible, then OPEN returns
-if passage data is still pending, the known defeat stays visible until it updates
+add the [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json), then find **Riri's PotD Counter** in `/xlplugins`
+you do not need to enable testing builds
 
-resets and wipes do not trigger it, duplicate events and reopening the HUD do not replay it
-long names fit on two lines, ordinary-floor counting and Flight behavior stay the same
+this promotes the same verified plugin archive from `v0.1.5-alpha.1`
+existing users keep their settings and already-installed 0.1.5 files, no reinstall is needed
 
-update in `/xlplugins` through your existing [shared Riri repository](https://give-riri-a-cookie.pages.dev/plugins/repo.json)
-try `/potd preview`, then open `/potd` and choose **boss victory**, **victory · two-line name** or **after the victory card**
-preview holds the chosen state for inspection, the live card uses the timer
+the boss-name victory card, combat hiding, first-floor counts and Flight tracking are included
+the new native victory trigger still needs its own in-game confirmation, [validation](https://github.com/bubblyslimea/potd-kill-counter/blob/main/VALIDATION.md) records that boundary
 
-the offline checks cover all 19 bosses, rejected events, timing, fade, resets, passage priority and existing counting rules
-the native boss-death event and timing still need their in-game confirmation
-
-[installation and testing notes](https://github.com/bubblyslimea/potd-kill-counter/blob/main/TECHNICAL_DETAILS.md)
+[installation notes](https://github.com/bubblyslimea/potd-kill-counter/blob/main/TECHNICAL_DETAILS.md)

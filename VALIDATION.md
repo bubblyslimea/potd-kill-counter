@@ -1,5 +1,12 @@
 # validation · 0.1.5.0 · 2026-11-03
 
+## stable promotion
+
+the stable catalog uses AssemblyVersion 0.1.5.0, IsTestingExclusive false and no Counter testing-only metadata
+four release-channel tests cover stable visibility, testing isolation, invalid channel/version combinations and preserved identity
+the Windows promotion must match the existing alpha ZIP SHA-256 exactly before it can publish
+plugin source and runtime behavior are unchanged by this channel promotion
+
 ## checked for this update
 
 | check | result |
@@ -21,7 +28,7 @@
 | compilation | actual Dalamud API 15 references, zero warnings and zero errors |
 | package | five reviewed runtime/license files, no debug metadata, host assemblies or identifying build paths |
 
-the [release](https://github.com/bubblyslimea/potd-kill-counter/releases/tag/v0.1.5-alpha.1) supplies the Windows ZIP, checksum, repository entry and individual runtime file hashes
+the [release](https://github.com/bubblyslimea/potd-kill-counter/releases/tag/v0.1.5) supplies the Windows ZIP, checksum, repository entry and individual runtime file hashes
 the local review build and Windows release are separate builds, use the release record when checking the download
 
 ## live evidence and remaining review

@@ -1,4 +1,6 @@
 {
-  "tag": "v0.1.5-alpha.1",
-  "channel": "testing"
+  "tag": "v0.1.5",
+  "channel": "stable",
+  "promotedFrom": "v0.1.5-alpha.1",
+  "expectedArchiveSha256": "1bd58055aebc724f6bf7630d84124de43d793649f4e151f058d80a144ecd0f53"
 }

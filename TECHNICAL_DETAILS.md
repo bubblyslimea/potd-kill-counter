@@ -2,7 +2,7 @@
 
 ## this build
 
-0.1.5.0 is a testing update, built for Dalamud API 15, .NET 10 and Windows x64
+0.1.5.0 is a stable release, built for Dalamud API 15, .NET 10 and Windows x64
 the release ZIP contains one plugin assembly, its manifest and dependency description, plus the license and acknowledgements
 Dalamud supplies the host assemblies, they are not included in the download
 
@@ -11,13 +11,15 @@ the tracker UI uses neutral wording, Riri’s voice is reserved for GitHub and d
 the counter itself makes no network requests and sends no telemetry
 GitHub and the shared catalog are used by the installer for downloads and updates, counting runs locally
 
-## installing the alpha
+## installing the tracker
 
 1. open `/xlsettings`, then **Experimental → Custom Plugin Repositories**
 2. add `https://give-riri-a-cookie.pages.dev/plugins/repo.json`, click **+** and **Save**
-3. enable **Get plugin testing builds** in **Experimental**, save, then open `/xlplugins` and install **Riri's PotD Counter**
+3. open `/xlplugins` and install **Riri's PotD Counter**
 
-this release is testing-only, it may be hidden until testing builds are enabled
+testing builds do not need to be enabled for this release
+existing 0.1.5 testing users already have the same plugin files, reinstalling is unnecessary
+this is the stable channel of the shared custom repository, it is not an official mainline Dalamud listing
 the existing `https://give-riri-a-cookie.pages.dev/notation/repo.json` address serves the same catalog, keep only one of these rows
 the old Netlify site's availability depends on its own hosting state, use the Pages address for a new installation
 
@@ -175,13 +177,16 @@ GitHub holds the public source and permanent release ZIPs
 the cookie site's Pages build combines Notation's own release entry with the shared catalog entries, then serves identical JSON at `/plugins/repo.json` and `/notation/repo.json`
 the counter's entry points directly to its versioned GitHub Release ZIP, future download hosts can change inside the entry without changing the user's repository row
 
-the GitHub workflow checks and packages main-branch builds, then publishes an alpha release only if that version does not already exist
+the GitHub workflow checks and packages main-branch builds, then publishes the explicitly selected stable or testing channel only if that tag does not already exist
 existing assets are compared by checksum, a changed build needs a new version
 the release includes `repo.json`, `PotdCounter.zip`, its checksum and a file-hash record
 the catalog must only be updated after those downloads have been verified
 
-the feed entry has `IsTestingExclusive: true`, with the real version in `TestingAssemblyVersion`
-live testing should precede a stable promotion, public source and a downloadable alpha do not imply that in-game validation is complete
+the stable feed entry has `IsTestingExclusive: false`, with `AssemblyVersion: 0.1.5.0`
+no separate Counter testing build is advertised at this time
+the stable release is pinned to the exact ZIP checksum of `v0.1.5-alpha.1`, the workflow rejects any archive difference
+future testing entries remain opt-in and must be newer than stable when both are advertised
+stable availability does not replace the remaining native victory-trigger validation recorded in [validation](VALIDATION.md)
 
 ## finding your way around
 

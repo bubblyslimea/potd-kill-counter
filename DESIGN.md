@@ -1,5 +1,12 @@
 # Riri's PotD Counter · Asura design
 
+## 0.1.5 stable promotion
+
+make the checked 0.1.5 build available without the testing switch through the existing shared repository
+keep the plugin version, identity, settings and runtime archive unchanged
+package stable channel metadata under v0.1.5, verify the archive against the published alpha checksum, then update the catalog and install guide
+retain an explicit testing channel for later work, verify both channel outputs and catalog merging before deployment
+
 ## 0.1.5 confirmed boss victory
 
 after an observed boss defeat, make the boss's name the headline and show `DEFEATED` with a green check beneath it

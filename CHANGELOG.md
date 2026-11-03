@@ -1,5 +1,11 @@
 # little changes
 
+## 0.1.5.0 · available on stable
+
+- available to everyone using the shared Riri repository, without enabling testing builds
+- the same checked 0.1.5 plugin archive, with settings and installed identity preserved
+- installation instructions now use the normal stable path
+
 ## 0.1.5.0 · a moment for the victory
 
 - the defeated boss’s name becomes the headline, with **DEFEATED** and a green check beneath it
