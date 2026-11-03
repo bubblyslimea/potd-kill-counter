@@ -23,7 +23,7 @@ jobs:
               "potd-counter-demo.gif": (1149248, "b2bf0971fb39ab8305b91d5f4355e31b7a04b8b3fe07095a098818d87bdf9d43"),
           }
           for name, (size, digest) in files.items():
-              data = base64.hexdecode((Path(".github/showcase-media") / (name + ".hex")).read_text(), validate=True)
+              data = bytes.fromhex((Path(".github/showcase-media") / (name + ".hex")).read_text())
               assert len(data) == size, "media size differs from the reviewed file"
               assert hashlib.sha256(data).hexdigest() == digest, "media checksum differs from the reviewed file"
               (Path("assets") / name).write_bytes(data)
