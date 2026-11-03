@@ -2,9 +2,11 @@
 
 a little counter for the climb
 
-![layout preview with simulated kills and Flight states](assets/counter-preview.svg)
+[![a short simulated demo of the kill estimate, Flight, boss combat and victory](assets/potd-counter-demo.gif)](https://github.com/bubblyslimea/potd-kill-counter/raw/refs/heads/main/assets/potd-counter-demo.webm)
 
-*a layout preview with pretend values, in-game screenshots are still to come*
+[watch the 23-second demo · WebM](https://github.com/bubblyslimea/potd-kill-counter/raw/refs/heads/main/assets/potd-counter-demo.webm)
+
+*a simulated HUD demo using the counter's display logic, not an in-game recording*
 
 keeps track of the kills you see, your Flight pomanders, and roughly how much might be left
 when the passage opens, it lets you know
@@ -14,6 +16,13 @@ a confirmed victory brings their name forward, with **DEFEATED** underneath
 
 no Flight required, the first floor still gets a kills-left estimate
 if earlier kills or Flight are uncertain, the range gets wider and stays labelled
+
+<details>
+<summary>see the states side by side</summary>
+
+![layout preview with simulated kills and Flight states](assets/counter-preview.svg)
+
+</details>
 
 ## come try it
 

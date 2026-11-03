@@ -1,0 +1,40 @@
+name: publish the checked counter showcase
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/showcase-media/**'
+      - '.github/workflows/publish-showcase.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - name: restore and verify the reviewed media
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          files = {
+              "potd-counter-demo.webm": (625693, "c2e2daab31c5358c4e570e7974fb839cd3e598de22c4dcb355bcd72ef05394d6"),
+              "potd-counter-demo.gif": (1149248, "b2bf0971fb39ab8305b91d5f4355e31b7a04b8b3fe07095a098818d87bdf9d43"),
+          }
+          for name, (size, digest) in files.items():
+              data = base64.hexdecode((Path(".github/showcase-media") / (name + ".hex")).read_text(), validate=True)
+              assert len(data) == size, "media size differs from the reviewed file"
+              assert hashlib.sha256(data).hexdigest() == digest, "media checksum differs from the reviewed file"
+              (Path("assets") / name).write_bytes(data)
+              print("verified", name, size, digest)
+          PY
+      - name: publish the media and remove the temporary transfer
+        run: |
+          git config user.name 'Riri Fujiwara'
+          git config user.email 'mushyslimea@gmail.com'
+          git add -- assets/potd-counter-demo.webm assets/potd-counter-demo.gif
+          git rm -- .github/showcase-media/potd-counter-demo.webm.hex .github/showcase-media/potd-counter-demo.gif.hex .github/workflows/publish-showcase.yml
+          git diff --cached --check
+          git commit -m 'publish the checked counter demo'
+          git push origin HEAD:main

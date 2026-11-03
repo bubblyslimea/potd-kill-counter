@@ -151,7 +151,7 @@ the 320 × 232 logical-pixel card keeps the same layout across states, with an e
 saved placement, lock and opacity are retained, new installations default to 96% opacity
 
 `PREVIEW.html` is an interactive layout study with the same 23 examples used by the native preview controls
-the README visual is also a labelled layout preview, neither is an in-game capture
+the README video and still gallery are labelled simulations, neither is an in-game capture
 the native simulation command lets you inspect the actual overlay without entering PotD
 
 ## building it yourself
@@ -170,6 +170,29 @@ python scripts/package.py
 the checks exercise all 200 floors, rare bounds, odd Flight rounding, duplicate and simultaneous deaths, stale events, consecutive Flight uses, floor changes, late attachment, party uncertainty, full clears, bosses and completion
 compilation uses actual Dalamud assemblies, offline checks cannot validate live native events or performance
 see [validation](VALIDATION.md) for that boundary and the in-game checklist
+
+## rebuilding the short showcase
+
+`scripts/Showcase` exports 12 sample states through the actual `CounterDisplay` and `CounterPresentation` models
+`scripts/build-showcase.py` turns that JSON into a 23-second HTML composition, using outlines from the shipped headline font
+supporting text uses DejaVu Sans to approximate the host font, the card keeps its native proportions
+the demo is deliberately silent, with instant count changes, a hidden HUD during boss combat and the real 180 ms victory fade and four-second hold
+separate floor examples are illustrative, the video is not a recorded continuous run or proof of native event detection
+
+the export needs .NET 10, Python with `fonttools`, DejaVu Sans, GSAP 3.14.2, HyperFrames 0.8.186 and FFmpeg
+set `HYPERFRAMES_NO_TELEMETRY=1`, `DO_NOT_TRACK=1`, `HYPERFRAMES_SKIP_SKILLS=1`, `HYPERFRAMES_NO_UPDATE_CHECK=1` and `HYPERFRAMES_NO_AUTO_INSTALL=1` in the render environment
+create `artifacts/` first, the font argument below is a placeholder for a local DejaVu Sans font file
+
+```text
+dotnet run --project scripts/Showcase -c Release -- artifacts/showcase-states.json
+python scripts/build-showcase.py artifacts/showcase-states.json artifacts/showcase --body-font <DEJAVU_SANS_TTF>
+```
+
+place the pinned GSAP script at `artifacts/showcase/assets/vendor/gsap-3.14.2.min.js`, keeping its accompanying license
+check the generated composition, then render it at 1280 × 720 and 30 fps with HyperFrames
+convert the render to VP9 WebM with FFmpeg, remove inherited metadata, and make a 960-pixel GIF for inline README playback
+the GIF links to the full WebM, both live under `assets/`
+review the finished encodes and their metadata before publishing
 
 ## publishing updates
 
